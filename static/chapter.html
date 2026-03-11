@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>阅读与播客 / 拆书工坊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%); 
+            min-height: 100vh; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            color: #d1d5db;
+        }
+        .glass-panel { 
+            background: rgba(40, 41, 54, 0.7); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 1.5rem; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        /* Markdown styles */
+        .prose-invert .prose-orange a { color: #f97316; }
+        .prose-invert .prose-orange a:hover { color: #ea580c; }
+        .prose-invert .prose-orange h1, .prose-invert .prose-orange h2, .prose-invert .prose-orange h3, .prose-invert .prose-orange h4, .prose-invert .prose-orange h5, .prose-invert .prose-orange h6 { color: #f97316; }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <div id="app" class="max-w-6xl mx-auto flex flex-col relative h-[85vh]">
+        <!-- CHAPTER DETAILED PLAYER VIEW -->
+        <div id="chapter-view" class="glass-panel p-8 h-full flex flex-col hidden">
+            <div class="flex items-center justify-between mb-6 pb-6 border-b border-white/10 flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <button id="back-btn" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg transition-colors border border-white/10 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        返回列表
+                    </button>
+                    <div>
+                        <h2 id="player-chapter-title" class="text-2xl font-bold text-white">加载中...</h2>
+                        <p id="player-book-title" class="text-sm text-gray-400 mt-1">所属书籍</p>
+                    </div>
+                </div>
+                
+                <!-- Toggle Switches -->
+                <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
+                    <button id="tab-audio" onclick="switchPlayerMode('audio')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-orange-500 text-white shadow-lg">原文 & 单音频</button>
+                    <button id="tab-podcast" onclick="switchPlayerMode('podcast')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:text-white">播客模式</button>
+                </div>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-8 flex-1 min-h-0">
+                <!-- Left: Markdown Article Render -->
+                <div class="flex-1 bg-black/30 border border-white/5 rounded-2xl p-6 overflow-y-auto">
+                    <div id="markdown-content" class="prose prose-invert prose-orange max-w-none text-gray-300 leading-relaxed">
+                        <!-- Content rendered by marked.js goes here -->
+                    </div>
+                </div>
+                
+                <!-- Right: Sticky Audio Player -->
+                <div class="w-full lg:w-80 flex-shrink-0 relative">
+                    <div class="sticky top-0 glass-panel p-6 border border-white/10 shadow-xl flex flex-col items-center">
+                        <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-inner flex items-center justify-center mb-6 relative overflow-hidden">
+                            <img id="player-cover" src="" class="absolute inset-0 w-full h-full object-cover opacity-60" />
+                            <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center">
+                                <span class="text-4xl">🎵</span>
+                            </div>
+                        </div>
+                        
+                        <h3 id="player-media-title" class="text-lg font-bold text-white mb-1 text-center truncate w-full">播放器准备中</h3>
+                        <p id="player-media-type" class="text-xs text-orange-400 font-medium mb-6 uppercase tracking-wider">AUDIO MODE</p>
+                        
+                        <div id="audio-container" class="w-full flex-col items-center justify-center">
+                            <!-- Native audio element -->
+                            <audio id="main-audio-player" controls class="w-full">
+                                <source src="" type="audio/mpeg">
+                                 您的浏览器不支持 audio 标签。
+                            </audio>
+                            <div id="no-audio-fallback" class="hidden text-center text-sm text-red-400 mt-2 bg-red-900/20 p-3 rounded-lg border border-red-500/20">
+                                尚未生成音频资源。<br/ >请返回列表页点击生成按钮。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loading-panel" class="text-center py-32 flex-grow">
+            <div class="inline-block relative w-20 h-20">
+                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500/20 rounded-full"></div>
+                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <p class="text-xl font-medium mt-6 text-orange-400 animate-pulse">正在加载章节内容...</p>
+        </div>
+    </div>
+
+    <script>
+        let currentBookName = null;
+        let currentChapterIndex = null;
+        let currentBookDetails = null;
+        let currentPlayerMode = 'audio';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            currentBookName = params.get('book');
+            currentChapterIndex = parseInt(params.get('chapter'), 10);
+            
+            if (currentBookName && !isNaN(currentChapterIndex)) {
+                document.getElementById('back-btn').onclick = () => {
+                    window.location.href = `/book.html?name=${encodeURIComponent(currentBookName)}`;
+                };
+                loadChapterData(currentBookName, currentChapterIndex);
+            } else {
+                alert("缺少章节参数！");
+                window.location.href = "/";
+            }
+        });
+
+        async function loadChapterData(bookName, chapterIndex) {
+            try {
+                const res = await fetch(`/api/books/${encodeURIComponent(bookName)}`);
+                const data = await res.json();
+                if (data.success) {
+                    currentBookDetails = data;
+                    if(chapterIndex >= 0 && chapterIndex < currentBookDetails.chapters.length) {
+                        renderChapterView();
+                    } else {
+                        alert("章节索引超出超外！");
+                        window.location.href = `/book.html?name=${encodeURIComponent(bookName)}`;
+                    }
+                } else {
+                    alert("加载失败：" + data.error);
+                    window.location.href = "/";
+                }
+            } catch (err) {
+                alert("网络或服务器错误：" + err.message);
+                window.location.href = "/";
+            }
+        }
+
+        function renderChapterView() {
+            document.getElementById('loading-panel').classList.add('hidden');
+            document.getElementById('chapter-view').classList.remove('hidden');
+            
+            const chapter = currentBookDetails.chapters[currentChapterIndex];
+            document.title = `${chapter.title} - ${currentBookDetails.book_name}`;
+            document.getElementById('player-chapter-title').innerText = chapter.title;
+            document.getElementById('player-media-title').innerText = chapter.title;
+            document.getElementById('player-book-title').innerText = currentBookDetails.book_name;
+            
+            if (currentBookDetails.cover) {
+                document.getElementById('player-cover').src = currentBookDetails.cover;
+            }
+
+            switchPlayerMode('audio');
+        }
+
+        function switchPlayerMode(mode) {
+            currentPlayerMode = mode;
+            const chapter = currentBookDetails.chapters[currentChapterIndex];
+            const bookName = currentBookDetails.book_name;
+            const chapterTitle = chapter.title;
+            
+            const btnAudio = document.getElementById('tab-audio');
+            const btnPodcast = document.getElementById('tab-podcast');
+            const mdContent = document.getElementById('markdown-content');
+            const audioPlayer = document.getElementById('main-audio-player');
+            const noAudioFallback = document.getElementById('no-audio-fallback');
+            const mediaTypeTxt = document.getElementById('player-media-type');
+
+            audioPlayer.pause();
+            
+            if (mode === 'audio') {
+                btnAudio.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-orange-500 text-white shadow-lg";
+                btnPodcast.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:text-white";
+                mediaTypeTxt.innerText = "AUDIO MODE";
+                mediaTypeTxt.className = "text-xs text-orange-400 font-medium mb-6 uppercase tracking-wider";
+                
+                mdContent.innerHTML = marked.parse(chapter.content || "内容正在加载中...");
+
+                if (chapter.has_audio) {
+                    noAudioFallback.classList.add('hidden');
+                    audioPlayer.classList.remove('hidden');
+                    audioPlayer.src = `/audio/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Audio.mp3`;
+                    audioPlayer.load();
+                } else {
+                    audioPlayer.classList.add('hidden');
+                    noAudioFallback.classList.remove('hidden');
+                }
+                
+            } else if (mode === 'podcast') {
+                btnPodcast.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-red-500 text-white shadow-lg";
+                btnAudio.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:text-white";
+                mediaTypeTxt.innerText = "PODCAST MODE";
+                 mediaTypeTxt.className = "text-xs text-red-400 font-medium mb-6 uppercase tracking-wider";
+
+                const podText = chapter.podcast_content 
+                                    ? chapter.podcast_content 
+                                    : "> 尚未生成Podcast脚本文本。\\n请在列表页点击 **生成 Podcast** 后查阅效果。";
+                mdContent.innerHTML = marked.parse(podText);
+
+                if (chapter.has_podcast) {
+                    noAudioFallback.classList.add('hidden');
+                    audioPlayer.classList.remove('hidden');
+                    audioPlayer.src = `/podcast/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.mp3`;
+                    audioPlayer.load();
+                } else {
+                    audioPlayer.classList.add('hidden');
+                    noAudioFallback.classList.remove('hidden');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

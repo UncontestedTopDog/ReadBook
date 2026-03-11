@@ -3,6 +3,8 @@ import argparse
 import zipfile
 import os
 import re
+import xml.etree.ElementTree as ET
+from urllib.parse import unquote
 from html.parser import HTMLParser
 
 class EPUBToMarkdown(HTMLParser):
@@ -34,8 +36,63 @@ class EPUBToMarkdown(HTMLParser):
     def get_text(self):
         return "".join(self.output).strip()
 
+def get_opf_path(z):
+    try:
+        with z.open('META-INF/container.xml') as f:
+            tree = ET.parse(f)
+            root = tree.getroot()
+            for rootfile in root.findall('.//{urn:oasis:names:tc:opendocument:xmlns:container}rootfile'):
+                return rootfile.get('full-path')
+    except Exception:
+        pass
+    return None
+
+def extract_cover(z, opf_path, output_dir):
+    if not opf_path: return False
+    try:
+        with z.open(opf_path) as f:
+            content_str = f.read().decode('utf-8')
+            
+            cover_href = None
+            m = re.search(r'<item[^>]+href="([^"]+)"[^>]+properties="cover-image"', content_str)
+            if not m:
+                m = re.search(r'<item[^>]+properties="cover-image"[^>]+href="([^"]+)"', content_str)
+            if m:
+                cover_href = m.group(1)
+            
+            if not cover_href:
+                m = re.search(r'<meta[^>]+name="cover"[^>]+content="([^"]+)"', content_str)
+                if m:
+                    cover_id = m.group(1)
+                    im = re.search(fr'<item[^>]+id="{cover_id}"[^>]+href="([^"]+)"', content_str)
+                    if not im:
+                        im = re.search(fr'<item[^>]+href="([^"]+)"[^>]+id="{cover_id}"', content_str)
+                    if im:
+                        cover_href = im.group(1)
+                        
+            if cover_href:
+                cover_href = unquote(cover_href)
+                opf_dir = os.path.dirname(opf_path)
+                cover_full_path = f"{opf_dir}/{cover_href}" if opf_dir and cover_href and not cover_href.startswith('/') else cover_href
+                cover_full_path = os.path.normpath(cover_full_path).replace('\\', '/')
+                
+                if cover_full_path in z.namelist():
+                    ext = os.path.splitext(cover_full_path)[1]
+                    cover_out_path = os.path.join(output_dir, f"cover{ext}")
+                    with z.open(cover_full_path) as source, open(cover_out_path, "wb") as target:
+                        target.write(source.read())
+                    print(f"成功提取封面: {cover_out_path}")
+                    return True
+    except Exception as e:
+        print(f"警告: 提取封面时出错: {e}")
+    return False
+
 def extract_chapters(epub_path, output_dir):
     with zipfile.ZipFile(epub_path, 'r') as z:
+        opf_path = get_opf_path(z)
+        if opf_path:
+            extract_cover(z, opf_path, output_dir)
+            
         # Check for nav.xhtml or toc.ncx
         nav_path = "EPUB/nav.xhtml"
         if nav_path not in z.namelist():

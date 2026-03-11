@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍库首⻚ / 拆书工坊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%); 
+            min-height: 100vh; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            color: #d1d5db;
+        }
+        .glass-panel { 
+            background: rgba(40, 41, 54, 0.7); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 1.5rem; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <div id="app" class="max-w-6xl mx-auto glass-panel p-8 min-h-[80vh] flex flex-col relative">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-red-500 cursor-pointer" onclick="window.location.reload()">
+                📚 拆书工坊 / 本地仓库
+            </h1>
+        </div>
+        
+        <!-- DASHBOARD PANEL -->
+        <div id="dashboard-panel" class="transition-all duration-500">
+            <!-- Upload Area -->
+            <div id="upload-btn" class="border-2 border-dashed border-gray-600/50 bg-white/5 rounded-2xl p-10 text-center hover:bg-white/10 hover:border-orange-500 transition-all cursor-pointer group mb-12" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" accept=".epub" class="hidden" onchange="handleFileUpload()">
+                <div class="flex items-center justify-center gap-6">
+                    <svg class="w-16 h-16 text-gray-500 group-hover:text-orange-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
+                    <div class="text-left">
+                        <p class="text-2xl font-medium text-gray-300 group-hover:text-white transition-colors">上传全新 EPUB 书籍</p>
+                        <p class="text-sm text-gray-500 mt-1">上传后将自动进行全文拆解，进度实时保存至本地</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Library / History -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    已拆解书库
+                </h3>
+                <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    <!-- Books Rendered Here -->
+                    <div class="col-span-full py-10 text-center text-gray-500 hidden" id="empty-state">
+                        暂无拆解记录，快去上传第一本书吧！
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-panel" class="hidden text-center py-32 flex-grow">
+            <div class="inline-block relative w-20 h-20">
+                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500/20 rounded-full"></div>
+                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <p class="text-xl font-medium mt-6 text-orange-400 animate-pulse">正在利用 Python 提取书籍章节并生成封面...</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLibrary();
+        });
+
+        async function loadLibrary() {
+            try {
+                const res = await fetch('/api/books');
+                const data = await res.json();
+                renderLibrary(data.books || []);
+            } catch (err) {
+                console.error("加载书库失败", err);
+            }
+        }
+
+        function renderLibrary(books) {
+            const grid = document.getElementById('library-grid');
+            const emptyState = document.getElementById('empty-state');
+            grid.innerHTML = ''; 
+            
+            if (books.length === 0) {
+                grid.appendChild(emptyState);
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            books.forEach(book => {
+                const card = document.createElement('div');
+                card.className = "group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-orange-500/20 transition-all hover:-translate-y-2 border border-white/5";
+                
+                const coverSrc = book.cover || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%239CA3AF' text-anchor='middle' dominant-baseline='middle'%3E暂无封面%3C/text%3E%3C/svg%3E";
+                
+                card.innerHTML = `
+                    <img src="${coverSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-4">
+                        <h4 class="text-white font-bold leading-tight mb-1 truncate">${book.name}</h4>
+                        <span class="text-xs text-orange-300 font-medium">${book.chapter_count} 个分离章节</span>
+                    </div>
+                `;
+
+                card.onclick = () => {
+                    window.location.href = '/book.html?name=' + encodeURIComponent(book.name);
+                };
+                grid.appendChild(card);
+            });
+        }
+
+        async function handleFileUpload() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            document.getElementById('dashboard-panel').classList.add('hidden');
+            document.getElementById('loading-panel').classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = '/book.html?name=' + encodeURIComponent(data.book_name);
+                } else {
+                    alert("书籍解析失败: " + data.error);
+                    document.getElementById('loading-panel').classList.add('hidden');
+                    document.getElementById('dashboard-panel').classList.remove('hidden');
+                }
+            } catch (error) {
+                alert("网络或服务器错误: " + error.message);
+                document.getElementById('loading-panel').classList.add('hidden');
+                document.getElementById('dashboard-panel').classList.remove('hidden');
+            } finally {
+                fileInput.value = ''; 
+            }
+        }
+    </script>
+</body>
+</html>

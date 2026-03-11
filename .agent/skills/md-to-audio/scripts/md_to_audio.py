@@ -4,7 +4,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
-def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None):
+def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None, subtitles=False):
     # 将输入路径转为 Path 对象
     md_path = Path(md_file_path).resolve()
     
@@ -16,20 +16,32 @@ def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None
     # 获取文件名（不带扩展名）
     file_name = md_path.stem
     
-    # 构建输出路径 (默认在运行路径下的 audio 目录中)
+    # 获取md文件的上一级目录名称，用于构建音频和字幕的输出目录
+    parent_folder_name = md_path.parent.name
+    
+    # 构建输出路径 (默认在运行路径下的 audio/<md上级目录> 目录中)
     if output_dir:
         audio_dir = Path(output_dir).resolve()
     else:
-        audio_dir = Path.cwd() / "audio"
+        audio_dir = Path.cwd() / "audio" / parent_folder_name
         
     audio_dir.mkdir(parents=True, exist_ok=True)
     
     # 输出音频文件路径
-    output_audio_path = audio_dir / f"{file_name}.mp3"
+    output_audio_path = audio_dir / f"{file_name}_Audio.mp3"
+    
+    if subtitles:
+        subtitles_dir = Path.cwd() / "subtitles" / parent_folder_name
+        subtitles_dir.mkdir(parents=True, exist_ok=True)
+        output_vtt_path = subtitles_dir / f"{file_name}_Subtitles.vtt"
+    else:
+        output_vtt_path = None
     
     print(f"🎙️  开始转换: {md_path.name}")
     print(f"🗣️  使用声音: {voice}")
-    print(f"🗂️  输出路径: {output_audio_path}")
+    print(f"🗂️  音频路径: {output_audio_path}")
+    if subtitles:
+        print(f"📜  字幕路径: {output_vtt_path}")
     
     # 构建 edge-tts 命令行调用参数
     command = [
@@ -39,10 +51,16 @@ def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None
         "--write-media", str(output_audio_path)
     ]
     
+    if subtitles:
+        command.extend(["--write-subtitles", str(output_vtt_path)])
+    
     try:
-        # 执行命令 (subprocess 会直接输出 edge-tts 的日志到终端)
+        # 执行命令
         subprocess.run(command, check=True)
-        print(f"\n✅ 转换成功！音频文件已保存至: {output_audio_path}")
+        print(f"\n✅ 转换成功！")
+        print(f"🎧 音频: {output_audio_path}")
+        if subtitles:
+            print(f"📝 字幕: {output_vtt_path}")
         return output_audio_path
         
     except subprocess.CalledProcessError as e:
@@ -50,7 +68,6 @@ def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None
         sys.exit(1)
     except FileNotFoundError:
         print("\n❌ 错误：找不到 'edge-tts' 命令。")
-        print("请确保已安装并通过终端可用：运行 `pip3 install edge-tts` (或者使用你本地环境对应的 pip)")
         sys.exit(1)
 
 if __name__ == "__main__":
@@ -58,6 +75,7 @@ if __name__ == "__main__":
     parser.add_argument("md_file", help="要转换的 markdown 文件路径")
     parser.add_argument("--voice", default="zh-CN-YunxiNeural", help="使用的声音，默认：zh-CN-YunxiNeural (云希男声)")
     parser.add_argument("--out-dir", help="自定义输出目录", default=None)
+    parser.add_argument("--subtitles", action="store_true", help="是否生成字幕文件 (.vtt)")
     
     args = parser.parse_args()
-    convert_md_to_audio(args.md_file, voice=args.voice, output_dir=args.out_dir)
+    convert_md_to_audio(args.md_file, voice=args.voice, output_dir=args.out_dir, subtitles=args.subtitles)

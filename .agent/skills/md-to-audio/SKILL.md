@@ -15,7 +15,7 @@ If not already available in the user's environment, `edge-tts` is required. You 
 
 ## How to execute
 
-A Python script is bundled with this skill to make the conversion easy. It automatically reads the markdown file, calls `edge-tts`, and outputs an `.mp3` file to an `audio` directory in the current working directory.
+A Python script is bundled with this skill to make the conversion easy. It automatically reads the markdown file, calls `edge-tts`, and outputs an `.mp3` file (named `OriginalFileName_Audio.mp3`) to an `audio` directory in the current working directory. It can also optionally output `.vtt` subtitles (named `OriginalFileName_Subtitles.vtt`) to a `subtitles` directory.
 
 The script is located at: `scripts/md_to_audio.py`
 
