@@ -1,77 +1,221 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html class="dark" lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>书籍库首⻚ / 拆书工坊</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拆书工坊 - EPUB 电子书管理</title>
+    <meta name="description" content="拆书工坊：上传 EPUB 电子书，自动拆解章节，生成封面，管理您的本地书库。">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff4d4d',
+                        darkbg: '#0f172a',
+                    },
+                    borderRadius: {
+                        'custom': '8px',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        body { 
-            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%); 
-            min-height: 100vh; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            color: #d1d5db;
+        body {
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            min-height: 100vh;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
         }
-        .glass-panel { 
-            background: rgba(40, 41, 54, 0.7); 
-            backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 1.5rem; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        ::-webkit-scrollbar { width: 8px; }
+        .orange-glow:hover {
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.4);
+            border-color: #ff4d4d;
+            transition: all 0.3s ease;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #ff4d4d 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
     </style>
 </head>
-<body class="p-6 md:p-12">
-    <div id="app" class="max-w-6xl mx-auto glass-panel p-8 min-h-[80vh] flex flex-col relative">
-        <div class="flex items-center justify-between mb-8">
-            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-red-500 cursor-pointer" onclick="window.location.reload()">
-                📚 拆书工坊 / 本地仓库
-            </h1>
-        </div>
-        
-        <!-- DASHBOARD PANEL -->
-        <div id="dashboard-panel" class="transition-all duration-500">
-            <!-- Upload Area -->
-            <div id="upload-btn" class="border-2 border-dashed border-gray-600/50 bg-white/5 rounded-2xl p-10 text-center hover:bg-white/10 hover:border-orange-500 transition-all cursor-pointer group mb-12" onclick="document.getElementById('file-input').click()">
-                <input type="file" id="file-input" accept=".epub" class="hidden" onchange="handleFileUpload()">
-                <div class="flex items-center justify-center gap-6">
-                    <svg class="w-16 h-16 text-gray-500 group-hover:text-orange-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
-                    <div class="text-left">
-                        <p class="text-2xl font-medium text-gray-300 group-hover:text-white transition-colors">上传全新 EPUB 书籍</p>
-                        <p class="text-sm text-gray-500 mt-1">上传后将自动进行全文拆解，进度实时保存至本地</p>
-                    </div>
-                </div>
-            </div>
+<body class="p-4 md:p-8">
 
-            <!-- Library / History -->
-            <div>
-                <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    已拆解书库
-                </h3>
-                <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    <!-- Books Rendered Here -->
-                    <div class="col-span-full py-10 text-center text-gray-500 hidden" id="empty-state">
-                        暂无拆解记录，快去上传第一本书吧！
-                    </div>
-                </div>
+    <!-- ===== HEADER ===== -->
+    <header class="max-w-7xl mx-auto flex justify-between items-center mb-12" id="site-header">
+        <div class="flex items-center gap-2">
+            <h1 class="text-3xl font-bold gradient-text cursor-pointer" onclick="window.location.reload()">📚 拆书工坊</h1>
+        </div>
+        <button
+            id="settings-btn"
+            class="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-custom transition-all"
+            onclick="toggleModal('settings-modal')"
+        >
+            <span>⚙️</span>
+            <span class="text-sm font-medium">设置模型</span>
+        </button>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="max-w-7xl mx-auto">
+
+        <!-- Loading Panel (full-page, shown during upload) -->
+        <div id="loading-panel" class="hidden flex flex-col items-center justify-center py-40">
+            <div class="relative w-16 h-16 mb-6">
+                <div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
+            <p class="text-xl font-medium text-primary animate-pulse">正在提取书籍章节并生成封面...</p>
+            <p class="text-sm text-white/40 mt-2">请稍候，这可能需要几分钟</p>
         </div>
 
-        <!-- Loading State -->
-        <div id="loading-panel" class="hidden text-center py-32 flex-grow">
-            <div class="inline-block relative w-20 h-20">
-                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500/20 rounded-full"></div>
-                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+        <!-- Dashboard Panel -->
+        <div id="dashboard-panel">
+
+            <!-- Book Grid (upload card + book cards rendered here) -->
+            <section
+                id="library-grid"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
+            >
+                <!-- Upload Card (always first) -->
+                <div
+                    id="upload-card"
+                    class="aspect-[2/3] glass-panel rounded-custom border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors group"
+                    onclick="document.getElementById('file-input').click()"
+                    title="上传新书"
+                >
+                    <input type="file" id="file-input" accept=".epub" class="hidden" onchange="handleFileUpload()">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <span class="text-primary text-2xl leading-none">+</span>
+                    </div>
+                    <p class="text-sm font-medium text-white/70">上传新书</p>
+                    <p class="text-[10px] text-white/40 mt-1">支持 EPUB 拖拽</p>
+                </div>
+
+                <!-- Empty state placeholder (hidden when books exist) -->
+                <div id="empty-state" class="col-span-full hidden">
+                    <div class="mt-16 flex flex-col items-center justify-center py-20 border-t border-white/5">
+                        <div class="opacity-20 mb-4 text-6xl">📭</div>
+                        <p class="text-white/50 text-lg">暂无拆解记录</p>
+                        <p class="text-white/30 text-sm mt-2">点击左上方"上传新书"开始您的第一本电子书拆解之旅</p>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /#dashboard-panel -->
+
+    </main>
+
+    <!-- ===== SETTINGS MODAL ===== -->
+    <div
+        id="settings-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden"
+        onclick="handleModalBackdropClick(event)"
+    >
+        <div class="glass-panel w-full max-w-md mx-4 p-6 rounded-custom shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">模型设置</h2>
+                <button class="text-white/50 hover:text-white text-2xl leading-none" onclick="toggleModal('settings-modal')">×</button>
             </div>
-            <p class="text-xl font-medium mt-6 text-orange-400 animate-pulse">正在利用 Python 提取书籍章节并生成封面...</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">API Key</label>
+                    <input
+                        id="api-key-input"
+                        class="w-full bg-black/20 border border-white/10 rounded-custom px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+                        placeholder="sk-..."
+                        type="password"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">API Base URL</label>
+                    <input
+                        id="api-base-input"
+                        class="w-full bg-black/20 border border-white/10 rounded-custom px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+                        placeholder="https://api.openai.com/v1"
+                        type="text"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">模型选择</label>
+                    <select
+                        id="model-select"
+                        class="w-full bg-black/20 border border-white/10 rounded-custom px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+                        onchange="handleModelChange(this.value)"
+                    >
+                        <option class="bg-darkbg" value="gpt-4o">GPT-4o</option>
+                        <option class="bg-darkbg" value="claude-3-5">Claude 3.5 Sonnet</option>
+                        <option class="bg-darkbg" value="custom">Custom（自定义）</option>
+                    </select>
+                </div>
+                <div id="custom-model-input" class="hidden">
+                    <label class="block text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">自定义模型名称</label>
+                    <input
+                        class="w-full bg-black/20 border border-white/10 rounded-custom px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+                        placeholder="e.g. gpt-4-turbo"
+                        type="text"
+                    >
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button
+                    class="flex-1 px-4 py-2 border border-white/10 rounded-custom text-sm font-medium hover:bg-white/5 transition-all"
+                    onclick="toggleModal('settings-modal')"
+                >取消</button>
+                <button
+                    class="flex-1 px-4 py-2 bg-primary text-white rounded-custom text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-primary/20"
+                    onclick="saveSettings()"
+                >保存设置</button>
+            </div>
         </div>
     </div>
 
+    <!-- ===== SCRIPTS ===== -->
     <script>
+        // ---- Modal helpers ----
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        function handleModalBackdropClick(event) {
+            if (event.target === document.getElementById('settings-modal')) {
+                toggleModal('settings-modal');
+            }
+        }
+
+        function handleModelChange(value) {
+            const customInput = document.getElementById('custom-model-input');
+            customInput.classList.toggle('hidden', value !== 'custom');
+        }
+
+        function saveSettings() {
+            // Placeholder – wire to your backend as needed
+            toggleModal('settings-modal');
+        }
+
+        // ---- Library ----
         document.addEventListener('DOMContentLoaded', () => {
             loadLibrary();
         });
@@ -82,44 +226,59 @@
                 const data = await res.json();
                 renderLibrary(data.books || []);
             } catch (err) {
-                console.error("加载书库失败", err);
+                console.error('加载书库失败', err);
             }
         }
 
         function renderLibrary(books) {
             const grid = document.getElementById('library-grid');
             const emptyState = document.getElementById('empty-state');
-            grid.innerHTML = ''; 
-            
+
+            // Remove old book cards (keep upload card + empty-state placeholder)
+            const existingCards = grid.querySelectorAll('[data-purpose="book-card"]');
+            existingCards.forEach(c => c.remove());
+
             if (books.length === 0) {
-                grid.appendChild(emptyState);
                 emptyState.classList.remove('hidden');
                 return;
-            } else {
-                emptyState.classList.add('hidden');
             }
 
+            emptyState.classList.add('hidden');
+
             books.forEach(book => {
+                const coverSrc = book.cover ||
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%239CA3AF' text-anchor='middle' dominant-baseline='middle'%3E暂无封面%3C/text%3E%3C/svg%3E";
+
                 const card = document.createElement('div');
-                card.className = "group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-orange-500/20 transition-all hover:-translate-y-2 border border-white/5";
-                
-                const coverSrc = book.cover || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%239CA3AF' text-anchor='middle' dominant-baseline='middle'%3E暂无封面%3C/text%3E%3C/svg%3E";
-                
+                card.setAttribute('data-purpose', 'book-card');
+                card.className = 'group cursor-pointer';
                 card.innerHTML = `
-                    <img src="${coverSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-4">
-                        <h4 class="text-white font-bold leading-tight mb-1 truncate">${book.name}</h4>
-                        <span class="text-xs text-orange-300 font-medium">${book.chapter_count} 个分离章节</span>
+                    <div class="aspect-[2/3] glass-panel rounded-custom overflow-hidden mb-3 orange-glow relative border border-white/10 transition-all">
+                        <img
+                            src="${coverSrc}"
+                            alt="${book.name} 封面"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        >
+                        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                            <span class="text-[10px] bg-primary/80 text-white px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                                Completed
+                            </span>
+                        </div>
                     </div>
+                    <h3 class="text-sm font-semibold truncate">${book.name}</h3>
+                    <p class="text-xs text-white/50">${book.chapter_count} 章节已拆解</p>
                 `;
 
                 card.onclick = () => {
                     window.location.href = '/book.html?name=' + encodeURIComponent(book.name);
                 };
-                grid.appendChild(card);
+
+                // Insert before the empty-state placeholder
+                grid.insertBefore(card, emptyState);
             });
         }
 
+        // ---- Upload ----
         async function handleFileUpload() {
             const fileInput = document.getElementById('file-input');
             const file = fileInput.files[0];
@@ -129,29 +288,28 @@
             document.getElementById('loading-panel').classList.remove('hidden');
 
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append('file', file);
 
             try {
                 const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
                 });
-                
                 const data = await response.json();
-                
+
                 if (data.success) {
                     window.location.href = '/book.html?name=' + encodeURIComponent(data.book_name);
                 } else {
-                    alert("书籍解析失败: " + data.error);
+                    alert('书籍解析失败: ' + data.error);
                     document.getElementById('loading-panel').classList.add('hidden');
                     document.getElementById('dashboard-panel').classList.remove('hidden');
                 }
             } catch (error) {
-                alert("网络或服务器错误: " + error.message);
+                alert('网络或服务器错误: ' + error.message);
                 document.getElementById('loading-panel').classList.add('hidden');
                 document.getElementById('dashboard-panel').classList.remove('hidden');
             } finally {
-                fileInput.value = ''; 
+                fileInput.value = '';
             }
         }
     </script>

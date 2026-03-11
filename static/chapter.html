@@ -1,136 +1,671 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" class="dark">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>阅读与播客 / 拆书工坊</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "primary-hover": "#d94d0a",
+                        "accent-glow": "#ff416c",
+                        "background-dark": "#0f0a1a",
+                        "glass-dark": "rgba(30, 20, 50, 0.7)",
+                        "accent-purple": "#4b2038",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "serif": ["Noto Serif SC", "serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
     <style>
-        body { 
-            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%); 
-            min-height: 100vh; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            color: #d1d5db;
+        /* ── Base ─────────────────────────────── */
+        body {
+            transition: background 0.5s ease;
         }
-        .glass-panel { 
-            background: rgba(40, 41, 54, 0.7); 
-            backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 1.5rem; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
-        }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-        /* Markdown styles */
-        .prose-invert .prose-orange a { color: #f97316; }
-        .prose-invert .prose-orange a:hover { color: #ea580c; }
-        .prose-invert .prose-orange h1, .prose-invert .prose-orange h2, .prose-invert .prose-orange h3, .prose-invert .prose-orange h4, .prose-invert .prose-orange h5, .prose-invert .prose-orange h6 { color: #f97316; }
+        body.audio-bg {
+            background: radial-gradient(circle at top right, #1e133a, #0f0a1a);
+            background-attachment: fixed;
+        }
+
+        body.podcast-bg {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background-attachment: fixed;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(236, 91, 19, 0.35);
+        }
+
+        /* ── Reading column ───────────────────── */
+        .reading-column {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* ── Markdown (audio mode) ────────────── */
+        #markdown-content h1,
+        #markdown-content h2,
+        #markdown-content h3,
+        #markdown-content h4,
+        #markdown-content h5,
+        #markdown-content h6 {
+            color: #f1f5f9;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        #markdown-content h1 {
+            font-size: 2rem;
+        }
+
+        #markdown-content h2 {
+            font-size: 1.5rem;
+        }
+
+        #markdown-content h3 {
+            font-size: 1.25rem;
+        }
+
+        #markdown-content p {
+            margin-bottom: 1.5rem;
+            line-height: 1.9;
+            color: #cbd5e1;
+        }
+
+        #markdown-content blockquote {
+            border-left: 3px solid #ec5b13;
+            padding: 0.5rem 1.25rem;
+            margin: 1.5rem 0;
+            background: rgba(236, 91, 19, 0.08);
+            border-radius: 0 0.5rem 0.5rem 0;
+            color: #f8a97d;
+            font-style: italic;
+        }
+
+        #markdown-content strong {
+            color: #f97316;
+            font-weight: 700;
+        }
+
+        #markdown-content em {
+            color: #e2e8f0;
+        }
+
+        #markdown-content code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            color: #f97316;
+        }
+
+        #markdown-content ul,
+        #markdown-content ol {
+            padding-left: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: #cbd5e1;
+        }
+
+        #markdown-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        #markdown-content a {
+            color: #ec5b13;
+            text-decoration: underline;
+        }
+
+        #markdown-content hr {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 2rem 0;
+        }
+
+        /* ── Progress bar ─────────────────────── */
+        #progress-bar-container {
+            cursor: pointer;
+        }
+
+        #progress-bar-fill {
+            transition: width 0.1s linear;
+        }
+
+        /* ── Reading progress ─────────────────── */
+        #reading-progress-fill {
+            transition: height 0.3s ease;
+        }
+
+        /* ── Scrollbar ────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ── Animations ───────────────────────── */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* ── Podcast dialogue bubbles ─────────── */
+        .dialogue-bubble {
+            opacity: 0;
+            transform: translateY(14px);
+            animation: bubbleIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes bubbleIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Dialogue bubble cards (glass style) ─── */
+        .bubble-left .bubble-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 1rem 1rem 1rem;
+        }
+
+        .bubble-right .bubble-card {
+            background: rgba(96, 165, 250, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(96, 165, 250, 0.1);
+            border-radius: 1rem 0 1rem 1rem;
+        }
+
+        /* ── Avatar borders ─────────────────────── */
+        .avatar-ring-left {
+            border: 2px solid rgba(236, 91, 19, 0.3);
+            transition: border-color 0.2s ease;
+        }
+
+        .group:hover .avatar-ring-left {
+            border-color: #ec5b13;
+        }
+
+        .avatar-ring-right {
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            transition: border-color 0.2s ease;
+        }
+
+        .group:hover .avatar-ring-right {
+            border-color: #60a5fa;
+        }
+
+        .avatar-ring-alt {
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            transition: border-color 0.2s ease;
+        }
+
+        .group:hover .avatar-ring-alt {
+            border-color: #a855f7;
+        }
+
+        .speaker-label-left {
+            color: #ec5b13;
+        }
+
+        .speaker-label-right {
+            color: #60a5fa;
+        }
+
+        .speaker-label-alt {
+            color: #c084fc;
+        }
+
+        /* ── Scene tag ─────────────────────────── */
+        .scene-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ── Podcast Chapter Nav ───────────────── */
+        .pod-nav-btn {
+            transition: all 0.2s ease;
+        }
+
+        .pod-nav-btn:hover .pod-nav-label {
+            color: #ec5b13;
+        }
+
+        .pod-nav-btn:hover .pod-nav-title {
+            color: #f1f5f9;
+        }
+
+        .pod-nav-btn:disabled,
+        .pod-nav-btn.opacity-30 {
+            opacity: 0.3;
+            pointer-events: none;
+        }
     </style>
 </head>
-<body class="p-6 md:p-12">
-    <div id="app" class="max-w-6xl mx-auto flex flex-col relative h-[85vh]">
-        <!-- CHAPTER DETAILED PLAYER VIEW -->
-        <div id="chapter-view" class="glass-panel p-8 h-full flex flex-col hidden">
-            <div class="flex items-center justify-between mb-6 pb-6 border-b border-white/10 flex-shrink-0">
-                <div class="flex items-center gap-4">
-                    <button id="back-btn" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg transition-colors border border-white/10 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        返回列表
+
+<body class="audio-bg font-display text-slate-100 min-h-screen">
+
+    <!-- Background Accent Blobs -->
+    <div id="blob-orange"
+        class="fixed top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none transition-opacity duration-500">
+    </div>
+    <div id="blob-purple"
+        class="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-accent-purple/10 rounded-full blur-[100px] -z-10 pointer-events-none transition-opacity duration-500">
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-panel" class="fixed inset-0 flex flex-col items-center justify-center z-50"
+        style="background:#0f0a1a">
+        <div class="relative w-20 h-20 mb-6">
+            <div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p class="text-xl font-medium text-primary animate-pulse">正在加载章节内容...</p>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+
+        <!-- ══════════════ TOP NAVIGATION ══════════════ -->
+        <nav id="top-nav" class="sticky top-0 z-50 w-full glass-effect border-b border-white/10 px-4 py-3 md:px-10"
+            style="background-color: rgba(30,20,50,0.55);">
+            <div class="max-w-6xl mx-auto flex items-center justify-between">
+
+                <!-- Left: Back + Title -->
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="back-btn"
+                        class="flex-shrink-0 flex items-center justify-center size-10 rounded-full hover:bg-white/10 transition-colors"
+                        title="返回列表">
+                        <span class="material-symbols-outlined text-white">arrow_back</span>
                     </button>
-                    <div>
-                        <h2 id="player-chapter-title" class="text-2xl font-bold text-white">加载中...</h2>
-                        <p id="player-book-title" class="text-sm text-gray-400 mt-1">所属书籍</p>
+                    <div class="flex flex-col min-w-0">
+                        <h1 id="nav-book-title"
+                            class="text-white text-sm font-semibold opacity-70 truncate max-w-[200px]">拆书工坊</h1>
+                        <h2 id="nav-chapter-title"
+                            class="text-white text-base font-bold leading-tight truncate max-w-[200px]">加载中...</h2>
                     </div>
                 </div>
-                
-                <!-- Toggle Switches -->
-                <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
-                    <button id="tab-audio" onclick="switchPlayerMode('audio')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-orange-500 text-white shadow-lg">原文 & 单音频</button>
-                    <button id="tab-podcast" onclick="switchPlayerMode('podcast')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:text-white">播客模式</button>
+
+                <!-- Center: Mode toggle (audio mode — shown in nav) -->
+                <div id="mode-toggle-nav"
+                    class="flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/10">
+                    <button id="tab-audio" onclick="switchPlayerMode('audio')"
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all bg-primary text-white shadow-lg">
+                        <span class="material-symbols-outlined text-[18px]">auto_stories</span>原文模式
+                    </button>
+                    <button id="tab-podcast" onclick="switchPlayerMode('podcast')"
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-[18px]">podcasts</span>播客模式
+                    </button>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <!-- Podcast: model settings btn (hidden in audio mode) -->
+                    <button id="nav-model-btn"
+                        class="hidden items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-all">
+                        <span class="material-symbols-outlined text-[20px]">settings_input_component</span>
+                        模型设置
+                    </button>
+                    <button id="nav-tune-btn"
+                        class="hidden items-center justify-center size-10 rounded-xl bg-primary text-white glow-orange hover:bg-primary-hover transition-all">
+                        <span class="material-symbols-outlined">tune</span>
+                    </button>
+                    <!-- Audio: search + settings (hidden in podcast mode) -->
+                    <button id="nav-search-btn"
+                        class="flex p-2 hover:bg-white/10 rounded-full transition-colors text-slate-300 items-center justify-center"
+                        title="搜索">
+                        <span class="material-symbols-outlined text-xl">search</span>
+                    </button>
+                    <button id="nav-settings-btn"
+                        class="flex p-2 hover:bg-white/10 rounded-full transition-colors text-slate-300 items-center justify-center"
+                        title="设置">
+                        <span class="material-symbols-outlined text-xl">settings</span>
+                    </button>
+                    <div
+                        class="size-10 rounded-full border-2 border-primary/50 bg-primary/20 flex items-center justify-center overflow-hidden">
+                        <span class="material-symbols-outlined text-primary text-xl">person</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="flex flex-col lg:flex-row gap-8 flex-1 min-h-0">
-                <!-- Left: Markdown Article Render -->
-                <div class="flex-1 bg-black/30 border border-white/5 rounded-2xl p-6 overflow-y-auto">
-                    <div id="markdown-content" class="prose prose-invert prose-orange max-w-none text-gray-300 leading-relaxed">
-                        <!-- Content rendered by marked.js goes here -->
+        </nav>
+
+        <!-- ══════════════ READING PROGRESS (xl, audio only) ══════════════ -->
+        <div id="reading-progress-sidebar"
+            class="fixed left-8 top-1/2 -translate-y-1/2 hidden xl:flex flex-col items-center gap-4 text-slate-500 z-40">
+            <span class="text-xs font-bold tracking-widest"
+                style="writing-mode:vertical-lr;transform:rotate(180deg)">PROGRESS</span>
+            <div class="w-px h-36 bg-white/10 relative rounded-full overflow-hidden">
+                <div id="reading-progress-fill"
+                    class="absolute top-0 left-0 w-full bg-primary shadow-[0_0_8px_rgba(236,91,19,0.5)]"
+                    style="height:0%"></div>
+            </div>
+            <span id="reading-progress-pct" class="text-sm font-medium text-primary">0%</span>
+        </div>
+
+        <!-- ══════════════ AUDIO MODE CONTENT ══════════════ -->
+        <main id="audio-content" class="relative pt-8 pb-44 px-6" style="min-height:calc(100vh - 60px)">
+            <article class="reading-column">
+
+                <!-- Chapter Header -->
+                <header class="mb-12 text-center">
+                    <div id="chapter-badge"
+                        class="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mb-6">
+                        原著精读
+                    </div>
+                    <h2 id="player-chapter-title"
+                        class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight font-serif">加载中...</h2>
+                    <div class="flex items-center justify-center gap-4 text-slate-400 text-sm">
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">auto_stories</span>
+                            <span id="player-book-title">所属书籍</span>
+                        </span>
+                        <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">headphones</span>
+                            音频模式
+                        </span>
+                    </div>
+                </header>
+
+                <!-- Article Content -->
+                <section class="font-serif text-lg md:text-xl leading-[1.9] text-slate-200 space-y-6">
+                    <div id="markdown-content"></div>
+                    <div id="no-audio-fallback" class="hidden text-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-600 mb-3 block">music_off</span>
+                        <p class="text-slate-400 text-base">尚未生成音频资源。</p>
+                        <p class="text-slate-500 text-sm mt-1">请返回列表页点击生成按钮。</p>
+                    </div>
+                </section>
+
+                <!-- Chapter Navigation Footer -->
+                <footer class="mt-20 pt-10 border-t border-white/10 flex items-center justify-between">
+                    <button id="prev-chapter-btn"
+                        class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                        <span
+                            class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                        <div class="text-left">
+                            <span class="block text-xs uppercase tracking-wider text-slate-500">上一章</span>
+                            <span id="prev-chapter-label" class="font-medium text-sm">-</span>
+                        </div>
+                    </button>
+                    <button id="next-chapter-btn"
+                        class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-right group">
+                        <div class="text-right">
+                            <span class="block text-xs uppercase tracking-wider text-slate-500">下一章</span>
+                            <span id="next-chapter-label" class="font-medium text-sm">-</span>
+                        </div>
+                        <span
+                            class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </button>
+                </footer>
+
+            </article>
+        </main>
+
+        <!-- ══════════════ PODCAST MODE CONTENT ══════════════ -->
+        <div id="podcast-content" class="hidden">
+
+            <!-- Centered Mode Toggle -->
+            <div class="flex justify-center pt-8 mb-10 px-4">
+                <div class="inline-flex p-1.5 glass-panel rounded-2xl border border-white/10">
+                    <button onclick="switchPlayerMode('audio')"
+                        class="flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-semibold transition-all hover:text-white text-slate-400">
+                        <span class="material-symbols-outlined text-[18px]">auto_stories</span>原文模式
+                    </button>
+                    <button onclick="switchPlayerMode('podcast')" id="podcast-tab-active"
+                        class="flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-semibold transition-all bg-primary text-white glow-orange">
+                        <span class="material-symbols-outlined text-[18px]">podcasts</span>播客模式
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dialogue area -->
+            <main class="max-w-4xl mx-auto px-4 pb-44">
+
+                <!-- Dialogue bubbles container -->
+                <div id="dialogue-container" class="space-y-8"></div>
+
+                <!-- No podcast fallback -->
+                <div id="no-podcast-fallback" class="hidden text-center py-20">
+                    <div
+                        class="inline-flex items-center justify-center size-20 rounded-full bg-white/5 border border-white/10 mb-6">
+                        <span class="material-symbols-outlined text-5xl text-slate-500">podcasts</span>
+                    </div>
+                    <p class="text-slate-400 text-base font-medium">尚未生成播客脚本</p>
+                    <p class="text-slate-500 text-sm mt-2">请返回列表页点击「生成 Podcast」后查阅</p>
+                </div>
+
+                <!-- Podcast Chapter Nav -->
+                <div class="mt-16 flex justify-between items-center border-t border-white/10 pt-8">
+                    <button id="pod-prev-btn" class="pod-nav-btn flex flex-col items-start group">
+                        <span
+                            class="pod-nav-label text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1 transition-colors">上一章</span>
+                        <span
+                            class="pod-nav-title text-slate-300 font-medium flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                            <span id="pod-prev-label">-</span>
+                        </span>
+                    </button>
+                    <button id="pod-next-btn" class="pod-nav-btn flex flex-col items-end group">
+                        <span
+                            class="pod-nav-label text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1 transition-colors">下一章</span>
+                        <span
+                            class="pod-nav-title text-slate-300 font-medium flex items-center gap-1 transition-colors">
+                            <span id="pod-next-label">-</span>
+                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        </span>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ══════════════ FIXED BOTTOM PLAYER ══════════════ -->
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-4xl z-50">
+            <div id="player-bar"
+                class="glass-panel rounded-3xl p-4 shadow-2xl flex flex-col md:flex-row items-center gap-4"
+                style="background-color:rgba(15,12,41,0.85);">
+
+                <!-- Track Info -->
+                <div class="flex items-center gap-3 w-full md:w-1/4 flex-shrink-0">
+                    <!-- Audio mode: cover img / icon -->
+                    <div id="cover-audio"
+                        class="size-12 rounded-lg bg-primary/20 flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/10">
+                        <img id="player-cover" src="" alt="封面" class="w-full h-full object-cover hidden" />
+                        <span id="player-cover-icon"
+                            class="material-symbols-outlined text-primary text-2xl">music_note</span>
+                    </div>
+                    <!-- Podcast mode: gradient equalizer icon -->
+                    <div id="cover-podcast"
+                        class="hidden size-12 rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg glow-orange"
+                        style="background:linear-gradient(135deg,#ec5b13,#ff416c)">
+                        <span class="material-symbols-outlined text-white text-3xl">equalizer</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h4 id="player-media-title" class="text-sm font-bold text-white truncate">播放器准备中</h4>
+                        <p id="player-media-type" class="text-xs text-primary truncate">AUDIO MODE</p>
                     </div>
                 </div>
-                
-                <!-- Right: Sticky Audio Player -->
-                <div class="w-full lg:w-80 flex-shrink-0 relative">
-                    <div class="sticky top-0 glass-panel p-6 border border-white/10 shadow-xl flex flex-col items-center">
-                        <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-inner flex items-center justify-center mb-6 relative overflow-hidden">
-                            <img id="player-cover" src="" class="absolute inset-0 w-full h-full object-cover opacity-60" />
-                            <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center">
-                                <span class="text-4xl">🎵</span>
-                            </div>
+
+                <!-- Playback Controls -->
+                <div class="flex-1 flex flex-col items-center gap-2 w-full">
+                    <div class="flex items-center gap-5 md:gap-6">
+                        <button id="btn-prev" class="text-slate-400 hover:text-white transition-colors" title="上一章">
+                            <span class="material-symbols-outlined text-[22px]">skip_previous</span>
+                        </button>
+                        <button id="btn-replay" class="text-slate-400 hover:text-white transition-colors" title="后退10秒">
+                            <span class="material-symbols-outlined text-[22px]">replay_10</span>
+                        </button>
+                        <button id="btn-play-pause"
+                            class="size-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-105 transition-transform glow-orange">
+                            <span id="play-icon" class="material-symbols-outlined fill-1 text-[28px]">play_arrow</span>
+                        </button>
+                        <button id="btn-forward" class="text-slate-400 hover:text-white transition-colors"
+                            title="前进30秒">
+                            <span class="material-symbols-outlined text-[22px]">forward_30</span>
+                        </button>
+                        <button id="btn-next" class="text-slate-400 hover:text-white transition-colors" title="下一章">
+                            <span class="material-symbols-outlined text-[22px]">skip_next</span>
+                        </button>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full flex items-center gap-3 px-2">
+                        <span id="time-current"
+                            class="text-[10px] font-mono text-slate-400 w-10 text-right flex-shrink-0">0:00</span>
+                        <div id="progress-bar-container" class="flex-1 h-1.5 bg-white/10 rounded-full relative group">
+                            <div id="progress-bar-fill" class="absolute left-0 top-0 h-full bg-primary rounded-full"
+                                style="width:0%"></div>
+                            <div id="progress-thumb"
+                                class="absolute top-1/2 -translate-y-1/2 size-3 bg-white rounded-full shadow-lg scale-0 group-hover:scale-100 transition-transform"
+                                style="left:0%"></div>
                         </div>
-                        
-                        <h3 id="player-media-title" class="text-lg font-bold text-white mb-1 text-center truncate w-full">播放器准备中</h3>
-                        <p id="player-media-type" class="text-xs text-orange-400 font-medium mb-6 uppercase tracking-wider">AUDIO MODE</p>
-                        
-                        <div id="audio-container" class="w-full flex-col items-center justify-center">
-                            <!-- Native audio element -->
-                            <audio id="main-audio-player" controls class="w-full">
-                                <source src="" type="audio/mpeg">
-                                 您的浏览器不支持 audio 标签。
-                            </audio>
-                            <div id="no-audio-fallback" class="hidden text-center text-sm text-red-400 mt-2 bg-red-900/20 p-3 rounded-lg border border-red-500/20">
-                                尚未生成音频资源。<br/ >请返回列表页点击生成按钮。
-                            </div>
+                        <span id="time-total"
+                            class="text-[10px] font-mono text-slate-400 w-10 flex-shrink-0">0:00</span>
+                    </div>
+                </div>
+
+                <!-- Speed & Volume -->
+                <div class="hidden md:flex items-center justify-end gap-4 w-1/4 flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">volume_up</span>
+                        <div class="w-16 h-1.5 bg-white/10 rounded-full relative overflow-hidden cursor-pointer"
+                            id="volume-bar-container">
+                            <div id="volume-bar-fill" class="absolute left-0 top-0 h-full bg-white/40 rounded-full"
+                                style="width:80%"></div>
                         </div>
                     </div>
+                    <button id="btn-speed"
+                        class="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-slate-300 hover:text-white transition-colors uppercase"
+                        title="播放速度">
+                        <span id="speed-label">1x SPEED</span>
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Loading State -->
-        <div id="loading-panel" class="text-center py-32 flex-grow">
-            <div class="inline-block relative w-20 h-20">
-                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500/20 rounded-full"></div>
-                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
-            </div>
-            <p class="text-xl font-medium mt-6 text-orange-400 animate-pulse">正在加载章节内容...</p>
-        </div>
+
+        <!-- Hidden native audio element -->
+        <audio id="main-audio-player" class="hidden"></audio>
     </div>
 
     <script>
+        // ════════════════════════════════════════════════
+        // State
+        // ════════════════════════════════════════════════
         let currentBookName = null;
         let currentChapterIndex = null;
         let currentBookDetails = null;
         let currentPlayerMode = 'audio';
+        const speeds = [0.75, 1, 1.25, 1.5, 2];
+        let speedIndex = 1;
+        const audioEl = document.getElementById('main-audio-player');
 
+        // ════════════════════════════════════════════════
+        // Init
+        // ════════════════════════════════════════════════
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             currentBookName = params.get('book');
             currentChapterIndex = parseInt(params.get('chapter'), 10);
-            
             if (currentBookName && !isNaN(currentChapterIndex)) {
-                document.getElementById('back-btn').onclick = () => {
-                    window.location.href = `/book.html?name=${encodeURIComponent(currentBookName)}`;
-                };
                 loadChapterData(currentBookName, currentChapterIndex);
             } else {
                 alert("缺少章节参数！");
                 window.location.href = "/";
             }
+            // Reading progress scroll
+            window.addEventListener('scroll', () => {
+                const docH = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docH > 0 ? Math.round((window.scrollY / docH) * 100) : 0;
+                document.getElementById('reading-progress-fill').style.height = pct + '%';
+                document.getElementById('reading-progress-pct').textContent = pct + '%';
+            });
         });
 
+        // ════════════════════════════════════════════════
+        // Load Data
+        // ════════════════════════════════════════════════
         async function loadChapterData(bookName, chapterIndex) {
             try {
                 const res = await fetch(`/api/books/${encodeURIComponent(bookName)}`);
                 const data = await res.json();
                 if (data.success) {
                     currentBookDetails = data;
-                    if(chapterIndex >= 0 && chapterIndex < currentBookDetails.chapters.length) {
+                    if (chapterIndex >= 0 && chapterIndex < currentBookDetails.chapters.length) {
                         renderChapterView();
                     } else {
-                        alert("章节索引超出超外！");
+                        alert("章节索引超出范围！");
                         window.location.href = `/book.html?name=${encodeURIComponent(bookName)}`;
                     }
                 } else {
@@ -145,76 +680,340 @@
 
         function renderChapterView() {
             document.getElementById('loading-panel').classList.add('hidden');
-            document.getElementById('chapter-view').classList.remove('hidden');
-            
+            document.getElementById('app').classList.remove('hidden');
+
             const chapter = currentBookDetails.chapters[currentChapterIndex];
-            document.title = `${chapter.title} - ${currentBookDetails.book_name}`;
+            const bookName = currentBookDetails.book_name;
+            const total = currentBookDetails.chapters.length;
+
+            document.title = `${chapter.title} - ${bookName}`;
             document.getElementById('player-chapter-title').innerText = chapter.title;
             document.getElementById('player-media-title').innerText = chapter.title;
-            document.getElementById('player-book-title').innerText = currentBookDetails.book_name;
-            
+            document.getElementById('player-book-title').innerText = bookName;
+            document.getElementById('nav-book-title').innerText = bookName;
+            document.getElementById('nav-chapter-title').innerText = chapter.title;
+
+            // Cover image
             if (currentBookDetails.cover) {
-                document.getElementById('player-cover').src = currentBookDetails.cover;
+                const coverImg = document.getElementById('player-cover');
+                coverImg.src = currentBookDetails.cover;
+                coverImg.classList.remove('hidden');
+                document.getElementById('player-cover-icon').classList.add('hidden');
             }
 
+            // Back button
+            document.getElementById('back-btn').onclick = () => {
+                window.location.href = `/book.html?name=${encodeURIComponent(currentBookName)}`;
+            };
+
+            // Prev/Next nav (audio mode)
+            const prevIdx = currentChapterIndex - 1;
+            const nextIdx = currentChapterIndex + 1;
+            setupChapterNavBtn('prev-chapter-btn', 'prev-chapter-label', prevIdx, total);
+            setupChapterNavBtn('next-chapter-btn', 'next-chapter-label', nextIdx, total);
+            // Prev/Next nav (podcast mode)
+            setupChapterNavBtn('pod-prev-btn', 'pod-prev-label', prevIdx, total);
+            setupChapterNavBtn('pod-next-btn', 'pod-next-label', nextIdx, total);
+
+            setupPlayerControls();
             switchPlayerMode('audio');
         }
 
+        function setupChapterNavBtn(btnId, labelId, idx, total) {
+            const btn = document.getElementById(btnId);
+            const lbl = document.getElementById(labelId);
+            if (idx >= 0 && idx < total) {
+                lbl.innerText = currentBookDetails.chapters[idx].title;
+                btn.onclick = () => {
+                    window.location.href = `/chapter.html?book=${encodeURIComponent(currentBookName)}&chapter=${idx}`;
+                };
+                btn.classList.remove('opacity-30', 'pointer-events-none');
+            } else {
+                lbl.innerText = '无';
+                btn.classList.add('opacity-30', 'pointer-events-none');
+            }
+        }
+
+        // ════════════════════════════════════════════════
+        // Mode Switch
+        // ════════════════════════════════════════════════
         function switchPlayerMode(mode) {
             currentPlayerMode = mode;
             const chapter = currentBookDetails.chapters[currentChapterIndex];
             const bookName = currentBookDetails.book_name;
             const chapterTitle = chapter.title;
-            
-            const btnAudio = document.getElementById('tab-audio');
-            const btnPodcast = document.getElementById('tab-podcast');
-            const mdContent = document.getElementById('markdown-content');
-            const audioPlayer = document.getElementById('main-audio-player');
-            const noAudioFallback = document.getElementById('no-audio-fallback');
-            const mediaTypeTxt = document.getElementById('player-media-type');
 
-            audioPlayer.pause();
-            
+            audioEl.pause();
+            resetProgress();
+
             if (mode === 'audio') {
-                btnAudio.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-orange-500 text-white shadow-lg";
-                btnPodcast.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:text-white";
-                mediaTypeTxt.innerText = "AUDIO MODE";
-                mediaTypeTxt.className = "text-xs text-orange-400 font-medium mb-6 uppercase tracking-wider";
-                
-                mdContent.innerHTML = marked.parse(chapter.content || "内容正在加载中...");
+                // ── Background ─────────────────────────
+                document.body.classList.remove('podcast-bg');
+                document.body.classList.add('audio-bg');
 
+                // ── Nav: show audio controls, hide podcast extras ─────────
+                document.getElementById('mode-toggle-nav').style.display = '';
+                document.getElementById('nav-model-btn').style.display = 'none';
+                document.getElementById('nav-tune-btn').style.display = 'none';
+                document.getElementById('nav-search-btn').style.display = '';
+                document.getElementById('nav-settings-btn').style.display = '';
+                document.getElementById('reading-progress-sidebar').style.display = '';
+
+                // ── Tab styles ──────────────────────────
+                document.getElementById('tab-audio').className =
+                    'flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all bg-primary text-white shadow-lg';
+                document.getElementById('tab-podcast').className =
+                    'flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all';
+
+                // ── Show/hide content panels ────────────
+                document.getElementById('audio-content').classList.remove('hidden');
+                document.getElementById('podcast-content').classList.add('hidden');
+
+                // ── Player cover ────────────────────────
+                document.getElementById('cover-audio').classList.remove('hidden');
+                document.getElementById('cover-podcast').classList.add('hidden');
+                document.getElementById('player-media-type').innerText = 'AUDIO MODE';
+                document.getElementById('player-media-type').className = 'text-xs text-primary truncate';
+
+                // ── Render content ──────────────────────
+                document.getElementById('markdown-content').innerHTML =
+                    marked.parse(chapter.content || '内容正在加载中...');
+
+                // ── Audio ───────────────────────────────
                 if (chapter.has_audio) {
-                    noAudioFallback.classList.add('hidden');
-                    audioPlayer.classList.remove('hidden');
-                    audioPlayer.src = `/audio/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Audio.mp3`;
-                    audioPlayer.load();
+                    document.getElementById('no-audio-fallback').classList.add('hidden');
+                    audioEl.src = `/audio/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Audio.mp3`;
+                    audioEl.load();
                 } else {
-                    audioPlayer.classList.add('hidden');
-                    noAudioFallback.classList.remove('hidden');
+                    audioEl.src = '';
+                    document.getElementById('no-audio-fallback').classList.remove('hidden');
                 }
-                
+
             } else if (mode === 'podcast') {
-                btnPodcast.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-red-500 text-white shadow-lg";
-                btnAudio.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:text-white";
-                mediaTypeTxt.innerText = "PODCAST MODE";
-                 mediaTypeTxt.className = "text-xs text-red-400 font-medium mb-6 uppercase tracking-wider";
+                // ── Background ─────────────────────────
+                document.body.classList.remove('audio-bg');
+                document.body.classList.add('podcast-bg');
 
-                const podText = chapter.podcast_content 
-                                    ? chapter.podcast_content 
-                                    : "> 尚未生成Podcast脚本文本。\\n请在列表页点击 **生成 Podcast** 后查阅效果。";
-                mdContent.innerHTML = marked.parse(podText);
+                // ── Nav: hide mode toggle in nav, show podcast right buttons ──
+                document.getElementById('mode-toggle-nav').style.display = 'none';
+                document.getElementById('nav-model-btn').style.display = 'flex';
+                document.getElementById('nav-tune-btn').style.display = 'flex';
+                document.getElementById('nav-search-btn').style.display = 'none';
+                document.getElementById('nav-settings-btn').style.display = 'none';
+                document.getElementById('reading-progress-sidebar').style.display = 'none';
 
-                if (chapter.has_podcast) {
-                    noAudioFallback.classList.add('hidden');
-                    audioPlayer.classList.remove('hidden');
-                    audioPlayer.src = `/podcast/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.mp3`;
-                    audioPlayer.load();
+                // ── Show/hide content panels ────────────
+                document.getElementById('audio-content').classList.add('hidden');
+                document.getElementById('podcast-content').classList.remove('hidden');
+
+                // ── Player cover ────────────────────────
+                document.getElementById('cover-audio').classList.add('hidden');
+                document.getElementById('cover-podcast').classList.remove('hidden');
+                document.getElementById('player-media-title').innerText = '播客: ' + currentBookDetails.book_name;
+                document.getElementById('player-media-type').innerText = 'PODCAST MODE';
+                document.getElementById('player-media-type').className = 'text-xs text-orange-400 truncate';
+
+                // ── Render dialogue ─────────────────────
+                if (chapter.podcast_content) {
+                    document.getElementById('no-podcast-fallback').classList.add('hidden');
+                    renderPodcastDialogue(chapter.podcast_content);
                 } else {
-                    audioPlayer.classList.add('hidden');
-                    noAudioFallback.classList.remove('hidden');
+                    document.getElementById('dialogue-container').innerHTML = '';
+                    document.getElementById('no-podcast-fallback').classList.remove('hidden');
+                }
+
+                // ── Audio ───────────────────────────────
+                if (chapter.has_podcast) {
+                    audioEl.src = `/podcast/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.mp3`;
+                    audioEl.load();
+                } else {
+                    audioEl.src = '';
                 }
             }
         }
+
+        // ════════════════════════════════════════════════
+        // Podcast Dialogue Renderer
+        // ════════════════════════════════════════════════
+        /**
+         * Parses podcast_content markdown and renders as chat bubbles.
+         * Supported formats:
+         *   **主持人：** text  → left bubble (orange)
+         *   **文学专家：** text → right bubble (blue/indigo)
+         *   **xxx：** text    → alternating
+         *   （scene text）    → scene description pill
+         *   regular lines     → scene description tag
+         *
+         * Falls back to raw markdown if no speaker found.
+         */
+
+        // Speaker avatar emoji pool (cycles)
+        const AVATAR_EMOJIS = ['🎙️', '📚', '🎭', '🌟', '💡'];
+
+        // Speaker style definitions
+        const SPEAKER_PRESETS = [
+            { side: 'left', avatarBg: 'linear-gradient(135deg,#ec5b13,#ff7f50)', avatarRing: 'avatar-ring-left', labelCls: 'speaker-label-left', cardCls: 'bubble-left', borderColor: 'border-primary/30' },
+            { side: 'right', avatarBg: 'linear-gradient(135deg,#3b82f6,#60a5fa)', avatarRing: 'avatar-ring-right', labelCls: 'speaker-label-right', cardCls: 'bubble-right', borderColor: 'border-blue-400/30' },
+            { side: 'left', avatarBg: 'linear-gradient(135deg,#7c3aed,#c084fc)', avatarRing: 'avatar-ring-alt', labelCls: 'speaker-label-alt', cardCls: 'bubble-left', borderColor: 'border-purple-400/30' },
+        ];
+
+        function renderPodcastDialogue(text) {
+            const container = document.getElementById('dialogue-container');
+            container.innerHTML = '';
+
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            let speakerCount = 0;
+            let delay = 0;
+            const speakerMap = {};  // speaker name → preset index
+
+            for (const line of lines) {
+                // ── Match **Speaker：** / **Speaker:** ──────
+                const match = line.match(/^\*\*([^*：:]+)[：:]\*\*\s*(.*)/);
+                if (match) {
+                    const speaker = match[1].trim();
+                    const content = match[2].trim();
+                    if (!content) continue;
+
+                    if (!(speaker in speakerMap)) {
+                        speakerMap[speaker] = speakerCount % SPEAKER_PRESETS.length;
+                        speakerCount++;
+                    }
+                    const preset = SPEAKER_PRESETS[speakerMap[speaker]];
+                    const emoji = AVATAR_EMOJIS[speakerMap[speaker] % AVATAR_EMOJIS.length];
+                    const isRight = preset.side === 'right';
+
+                    const bubble = document.createElement('div');
+                    bubble.className = `flex gap-4 items-start ${isRight ? 'flex-row-reverse' : ''} ${preset.cardCls} dialogue-bubble group`;
+                    bubble.style.animationDelay = delay + 'ms';
+
+                    bubble.innerHTML = `
+                        <div class="flex-shrink-0">
+                            <div class="size-12 rounded-2xl overflow-hidden ${preset.avatarRing} flex items-center justify-center text-xl select-none"
+                                 style="background:${preset.avatarBg};">${emoji}</div>
+                            <p class="text-[10px] text-center mt-1 ${preset.labelCls} font-bold">${escapeHtml(speaker)}</p>
+                        </div>
+                        <div class="flex-1 bubble-card p-5">
+                            <p class="text-slate-200 leading-relaxed text-lg">${escapeHtml(content)}</p>
+                        </div>`;
+                    container.appendChild(bubble);
+                    delay += 90;
+
+                    // ── Scene / narration line ──────────────────
+                } else if (line.startsWith('>') || line.startsWith('（') || line.startsWith('(') ||
+                    (line.length < 80 && !line.includes('：') && !line.includes(':') && speakerCount > 0)) {
+                    const sceneText = line.replace(/^>\s*/, '');
+                    const tag = document.createElement('div');
+                    tag.className = 'flex justify-center py-3 dialogue-bubble';
+                    tag.style.animationDelay = delay + 'ms';
+                    tag.innerHTML = `<span class="scene-tag px-4 py-1 rounded-full">${escapeHtml(sceneText)}</span>`;
+                    container.appendChild(tag);
+                    delay += 60;
+
+                } else if (line && speakerCount === 0) {
+                    // Before first speaker → treat as intro narration
+                    const tag = document.createElement('div');
+                    tag.className = 'flex justify-center py-3 dialogue-bubble';
+                    tag.style.animationDelay = delay + 'ms';
+                    tag.innerHTML = `<span class="scene-tag px-4 py-1 rounded-full italic">${escapeHtml(line)}</span>`;
+                    container.appendChild(tag);
+                    delay += 60;
+                }
+            }
+
+            // Fallback: raw markdown
+            if (container.children.length === 0) {
+                container.innerHTML = `<div class="text-slate-300 leading-relaxed space-y-4 prose-like">${marked.parse(text)}</div>`;
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // ════════════════════════════════════════════════
+        // Player Controls
+        // ════════════════════════════════════════════════
+        function setupPlayerControls() {
+            document.getElementById('btn-play-pause').onclick = () => {
+                if (audioEl.src && !audioEl.src.endsWith('/chapter.html')) {
+                    audioEl.paused ? audioEl.play() : audioEl.pause();
+                }
+            };
+            document.getElementById('btn-replay').onclick = () => {
+                audioEl.currentTime = Math.max(0, audioEl.currentTime - 10);
+            };
+            document.getElementById('btn-forward').onclick = () => {
+                audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 30);
+            };
+            document.getElementById('btn-prev').onclick = () => {
+                // navigate to prev chapter if available
+                const prevIdx = currentChapterIndex - 1;
+                if (prevIdx >= 0) {
+                    window.location.href = `/chapter.html?book=${encodeURIComponent(currentBookName)}&chapter=${prevIdx}`;
+                }
+            };
+            document.getElementById('btn-next').onclick = () => {
+                const nextIdx = currentChapterIndex + 1;
+                if (nextIdx < currentBookDetails.chapters.length) {
+                    window.location.href = `/chapter.html?book=${encodeURIComponent(currentBookName)}&chapter=${nextIdx}`;
+                }
+            };
+            document.getElementById('btn-speed').onclick = () => {
+                speedIndex = (speedIndex + 1) % speeds.length;
+                audioEl.playbackRate = speeds[speedIndex];
+                document.getElementById('speed-label').innerText = speeds[speedIndex] + 'x SPEED';
+            };
+
+            audioEl.addEventListener('play', () => { document.getElementById('play-icon').innerText = 'pause'; });
+            audioEl.addEventListener('pause', () => { document.getElementById('play-icon').innerText = 'play_arrow'; });
+            audioEl.addEventListener('timeupdate', updateProgress);
+            audioEl.addEventListener('loadedmetadata', () => {
+                document.getElementById('time-total').innerText = formatTime(audioEl.duration);
+            });
+            audioEl.addEventListener('ended', () => {
+                document.getElementById('play-icon').innerText = 'play_arrow';
+                resetProgress();
+            });
+
+            // Progress bar
+            const progressBar = document.getElementById('progress-bar-container');
+            progressBar.addEventListener('click', (e) => {
+                if (!audioEl.duration) return;
+                const rect = progressBar.getBoundingClientRect();
+                audioEl.currentTime = ((e.clientX - rect.left) / rect.width) * audioEl.duration;
+            });
+
+            // Volume bar
+            document.getElementById('volume-bar-container').addEventListener('click', (e) => {
+                const rect = document.getElementById('volume-bar-container').getBoundingClientRect();
+                const vol = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                audioEl.volume = vol;
+                document.getElementById('volume-bar-fill').style.width = (vol * 100) + '%';
+            });
+        }
+
+        function updateProgress() {
+            if (!audioEl.duration) return;
+            const pct = (audioEl.currentTime / audioEl.duration) * 100;
+            document.getElementById('progress-bar-fill').style.width = pct + '%';
+            document.getElementById('progress-thumb').style.left = pct + '%';
+            document.getElementById('time-current').innerText = formatTime(audioEl.currentTime);
+        }
+
+        function resetProgress() {
+            document.getElementById('progress-bar-fill').style.width = '0%';
+            document.getElementById('progress-thumb').style.left = '0%';
+            document.getElementById('time-current').innerText = '0:00';
+            document.getElementById('time-total').innerText = '0:00';
+            document.getElementById('play-icon').innerText = 'play_arrow';
+        }
+
+        function formatTime(s) {
+            if (isNaN(s)) return '0:00';
+            const m = Math.floor(s / 60);
+            return `${m}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
+        }
     </script>
 </body>
+
 </html>

@@ -1,117 +1,241 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html class="dark" lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>书籍详情 / 拆书工坊</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
     <style>
-        body { 
-            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%); 
-            min-height: 100vh; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            color: #d1d5db;
+        .glass-panel {
+            background: rgba(34, 22, 16, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(236, 91, 19, 0.1);
         }
-        .glass-panel { 
-            background: rgba(40, 41, 54, 0.7); 
-            backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 1.5rem; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(236, 91, 19, 0.15);
+            border-color: rgba(236, 91, 19, 0.35);
         }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        .animate-spin-slow {
+            animation: spin 1.2s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(236, 91, 19, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(236, 91, 19, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(236, 91, 19, 0.35);
+        }
     </style>
 </head>
-<body class="p-6 md:p-12">
-    <div id="app" class="max-w-6xl mx-auto glass-panel p-8 min-h-[80vh] flex flex-col relative">
-        <div class="flex items-center justify-between mb-8">
-            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-red-500 cursor-pointer" onclick="window.location.href='/'">
-                📚 拆书工坊 / 本地仓库
-            </h1>
-            <div class="flex items-center gap-4">
-                <button onclick="openSettings()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl transition-all font-medium border border-white/10 flex items-center gap-2">
-                    ⚙️ 设置模型
+
+<body class="bg-background-dark font-display text-slate-100 min-h-screen selection:bg-primary/30">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-primary/10 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <a class="flex items-center gap-2 group cursor-pointer" onclick="window.location.href='/'">
+                <div class="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined text-white text-2xl"
+                        style="font-variation-settings:'FILL' 1">menu_book</span>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-100 group-hover:text-primary transition-colors">
+                    拆书工坊</h1>
+            </a>
+            <div class="flex items-center gap-3">
+                <button onclick="window.location.href='/'"
+                    class="p-2 hover:bg-primary/10 rounded-full transition-colors text-slate-400 hover:text-primary"
+                    title="返回主页">
+                    <span class="material-symbols-outlined">arrow_back</span>
                 </button>
-                <button onclick="window.location.href='/'" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all font-medium border border-white/10 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    返回主页仓库
+                <button onclick="openSettings()"
+                    class="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl border border-primary/20 transition-all font-medium">
+                    <span class="material-symbols-outlined text-[20px]">settings</span>
+                    <span>配置中心</span>
                 </button>
             </div>
         </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-8">
 
         <!-- Loading State -->
-        <div id="loading-panel" class="text-center py-32 flex-grow">
-            <div class="inline-block relative w-20 h-20">
-                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500/20 rounded-full"></div>
-                <div class="absolute top-0 left-0 w-full h-full border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+        <div id="loading-panel" class="text-center py-32">
+            <div class="inline-flex flex-col items-center gap-6">
+                <div class="relative w-16 h-16">
+                    <div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+                    <div
+                        class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin">
+                    </div>
+                </div>
+                <p class="text-lg font-medium text-primary/80 animate-pulse">正在加载书籍信息...</p>
             </div>
-            <p class="text-xl font-medium mt-6 text-orange-400 animate-pulse">正在加载书籍信息...</p>
         </div>
 
-        <!-- Result Area (Single Book Details) -->
-        <div id="result-panel" class="hidden opacity-0 transition-opacity duration-500 flex-grow">
-            <div class="flex flex-col md:flex-row gap-10 mb-8 items-start h-full">
-                <div class="w-full md:w-1/3 flex flex-col gap-4">
-                    <div class="relative group">
-                        <img id="book-cover" src="" alt="书籍封面" class="w-full rounded-xl shadow-2xl aspect-[2/3] object-cover border border-white/10 group-hover:scale-[1.02] transition-transform duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-end p-6">
-                            <span class="text-sm font-medium text-white/80" id="book-meta"></span>
+        <!-- Result Area -->
+        <div id="result-panel" class="hidden opacity-0 transition-opacity duration-500">
+
+            <!-- Book Info Header -->
+            <section class="flex flex-col md:flex-row gap-8 mb-12 items-start">
+                <!-- Cover -->
+                <div class="relative group shrink-0">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-primary to-orange-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
+                    </div>
+                    <div class="relative w-44 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl">
+                        <img id="book-cover" src="" alt="书籍封面" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <!-- Info -->
+                <div class="flex-1 pt-2">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span
+                            class="px-2 py-1 rounded bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider">已完成拆解</span>
+                        <span id="book-meta" class="text-slate-500 text-sm"></span>
+                    </div>
+                    <h2 id="book-title" class="text-4xl font-extrabold text-slate-100 mb-4 tracking-tight">重新加载中...</h2>
+                    <p id="book-description" class="text-slate-400 text-base mb-6 leading-relaxed max-w-2xl hidden"></p>
+                    <div class="flex flex-wrap gap-6">
+                        <div class="flex flex-col">
+                            <span class="text-slate-500 text-xs uppercase font-bold tracking-widest">章节总数</span>
+                            <span id="chapter-count" class="text-2xl font-bold text-slate-100">0 章节</span>
+                        </div>
+                        <div class="w-px h-10 bg-primary/10 self-center"></div>
+                        <div class="flex flex-col">
+                            <span class="text-slate-500 text-xs uppercase font-bold tracking-widest">已产出音频</span>
+                            <span id="audio-count" class="text-2xl font-bold text-slate-100">0 份</span>
+                        </div>
+                        <div class="w-px h-10 bg-primary/10 self-center"></div>
+                        <div class="flex flex-col">
+                            <span class="text-slate-500 text-xs uppercase font-bold tracking-widest">已生成播客</span>
+                            <span id="podcast-count" class="text-2xl font-bold text-slate-100">0 份</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="w-full md:w-2/3 flex flex-col h-full">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h2 id="book-title" class="text-3xl font-bold text-white mb-2 leading-tight">重新加载中...</h2>
-                            <p class="text-gray-400 text-sm">共成功解构出 <span id="chapter-count" class="font-bold text-orange-400 text-lg">0</span> 个知识章节区块。</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-800/50 rounded-2xl p-6 border border-white/5 flex-grow">
-                        <h3 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-4">拆解产物列表 (Markdown)</h3>
-                        <div id="chapter-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                        </div>
-                    </div>
+            </section>
+
+            <!-- Chapter List Management -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">list_alt</span>
+                        章节管理
+                    </h3>
+                    <p class="text-sm text-slate-500">
+                        💡 点击章节行可浏览原文、收听单集、体验双人播客
+                    </p>
                 </div>
-            </div>
-            
-            <div class="mt-8 pt-6 border-t border-white/10 text-center">
-                <p class="text-sm text-gray-500">💡 提示: 点击章节行可下沉浏览原文、收听单集、体验完整的双人播客；直接点击按钮可分别发给大模型排队制作。</p>
-            </div>
+                <div id="chapter-list" class="space-y-4">
+                </div>
+            </section>
+
         </div>
-    </div>
+    </main>
 
     <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="glass-panel p-8 w-[90%] max-w-md transform scale-95 transition-transform duration-300" id="settings-content">
-            <h2 class="text-2xl font-bold text-white mb-6">⚙️ 模型配置</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">API Key (OpenAI 兼容)</label>
-                    <input type="password" id="api-key-input" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="sk-...">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">API Base URL (可选)</label>
-                    <input type="text" id="api-base-input" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="https://api.openai.com/v1">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">模型选择 (Model) 或手动输入</label>
-                    <select id="model-select" onchange="checkCustomModel()" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none outline-none mb-2">
-                        <option value="gpt-4o-mini" class="bg-gray-800">gpt-4o-mini (默认，快)</option>
-                        <option value="gpt-4o" class="bg-gray-800">gpt-4o (精推，强)</option>
-                        <option value="gpt-3.5-turbo" class="bg-gray-800">gpt-3.5-turbo</option>
-                        <option value="custom" class="bg-gray-800">自定义输入 (Custom)...</option>
-                    </select>
-                    <input type="text" id="custom-model-input" class="hidden w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors" placeholder="例如: deepseek-chat">
-                </div>
-                <p class="text-xs text-gray-500 mt-2">设置将只保存在您当前的浏览器本地缓存中。</p>
+    <div id="settings-modal"
+        class="fixed inset-0 z-[100] bg-background-dark/80 backdrop-blur-sm flex items-center justify-center p-6 hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-lg rounded-2xl shadow-2xl border border-primary/30 overflow-hidden transform scale-95 transition-transform duration-300"
+            id="settings-content">
+            <div class="px-6 py-4 border-b border-primary/10 flex justify-between items-center bg-primary/5">
+                <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">settings</span>
+                    API 配置中心
+                </h3>
+                <button onclick="closeSettings()" class="text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
-            <div class="mt-8 flex justify-end gap-3">
-                <button onclick="closeSettings()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">取消</button>
-                <button onclick="saveSettings()" class="px-5 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg shadow-lg hover:shadow-orange-500/30 transition-shadow">保存配置</button>
+            <div class="p-6 space-y-5">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">API 密钥 (API Key)</label>
+                    <input type="password" id="api-key-input"
+                        class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
+                        placeholder="sk-...">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">接口地址 (Base URL)</label>
+                    <input type="text" id="api-base-input"
+                        class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
+                        placeholder="https://api.openai.com/v1">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">AI 模型</label>
+                        <select id="model-select" onchange="checkCustomModel()"
+                            class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all appearance-none">
+                            <option value="gpt-4o-mini" class="bg-background-dark">gpt-4o-mini (默认，快)</option>
+                            <option value="gpt-4o" class="bg-background-dark">gpt-4o (精推，强)</option>
+                            <option value="gpt-3.5-turbo" class="bg-background-dark">gpt-3.5-turbo</option>
+                            <option value="custom" class="bg-background-dark">自定义输入...</option>
+                        </select>
+                        <input type="text" id="custom-model-input"
+                            class="hidden w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
+                            placeholder="例如: deepseek-chat">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">生成并发数</label>
+                        <input type="number" id="concurrency-input"
+                            class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
+                            value="3">
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500">设置将只保存在您当前的浏览器本地缓存中。</p>
+                <div class="pt-2 flex gap-3">
+                    <button onclick="closeSettings()"
+                        class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition-all border border-slate-700">
+                        取消
+                    </button>
+                    <button onclick="saveSettings()"
+                        class="flex-1 px-4 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20">
+                        保存配置
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -151,64 +275,107 @@
             currentBookDetails = data;
             document.title = `${data.book_name} - 拆书工坊`;
             document.getElementById('loading-panel').classList.add('hidden');
-            
+
             const resultPanel = document.getElementById('result-panel');
             resultPanel.classList.remove('hidden');
-            
-            setTimeout(() => {
-                resultPanel.classList.remove('opacity-0');
-            }, 50);
+            setTimeout(() => { resultPanel.classList.remove('opacity-0'); }, 50);
 
+            // Cover
             const coverImg = document.getElementById('book-cover');
             if (data.cover) {
                 coverImg.src = data.cover;
             } else {
-                coverImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%239CA3AF' text-anchor='middle' dominant-baseline='middle'%3E暂无封面%3C/text%3E%3C/svg%3E";
+                coverImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23362010'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%23ec5b13' text-anchor='middle' dominant-baseline='middle'%3E暂无封面%3C/text%3E%3C/svg%3E";
             }
 
+            // Title & Meta
             document.getElementById('book-title').innerText = data.book_name || "未知书名";
-            document.getElementById('chapter-count').innerText = (data.chapters || []).length;
-            document.getElementById('book-meta').innerText = `包含 ${(data.chapters || []).length} 个章节片段`;
+            const chapters = data.chapters || [];
+            const audioCount = chapters.filter(c => c.has_audio).length;
+            const podcastCount = chapters.filter(c => c.has_podcast).length;
 
+            document.getElementById('chapter-count').innerText = `${chapters.length} 章节`;
+            document.getElementById('audio-count').innerText = `${audioCount} 份`;
+            document.getElementById('podcast-count').innerText = `${podcastCount} 份`;
+            document.getElementById('book-meta').innerText = `共 ${chapters.length} 个章节片段`;
+
+            // Chapter List
             const listEl = document.getElementById('chapter-list');
             listEl.innerHTML = '';
-            
-            data.chapters.forEach((chapter, index) => {
-                const li = document.createElement('li');
-                li.className = "group flex flex-col p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-white/10";
-                
-                let previewText = chapter.content.replace(/[#*\\n]/g, ' ').substring(0, 60).trim();
-                if (previewText.length === 60) previewText += '...';
-                
-                const audioBtnHTML = chapter.has_audio 
-                    ? `<button class="px-3 py-1.5 bg-green-500/20 text-green-400 text-xs font-bold rounded flex items-center gap-1.5 shadow-lg cursor-default border border-green-500/50" onclick="event.stopPropagation()"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>录音已成</button>`
-                    : `<button data-chapter="${chapter.title}" onclick="generateSingleAudio(event, this)" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors shadow-lg shadow-orange-500/20"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>生成单声音频</button>`;
 
-                const podcastBtnHTML = chapter.has_podcast
-                    ? `<div class="flex items-center gap-2"><div class="px-3 py-1.5 bg-green-500/20 text-green-400 text-xs font-bold rounded flex items-center gap-1.5 shadow-lg cursor-default border border-green-500/50" onclick="event.stopPropagation()"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>播客已成</div><button data-chapter="${chapter.title}" onclick="generatePodcast(event, this, true)" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors shadow-lg border border-white/10"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>重新生成</button></div>`
-                    : `<button data-chapter="${chapter.title}" onclick="generatePodcast(event, this, false)" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors shadow-lg shadow-red-500/20"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>生成连麦 Podcast</button>`;
+            chapters.forEach((chapter, index) => {
+                let previewText = chapter.content.replace(/[#*\n]/g, ' ').substring(0, 80).trim();
+                if (previewText.length === 80) previewText += '...';
 
-                li.innerHTML = `
-                    <div class="flex items-center gap-4 min-w-0 w-full mb-3" onclick="goToChapter(${index})">
-                        <div class="w-8 h-8 rounded-full bg-gray-700 font-mono text-xs flex items-center justify-center text-gray-400 group-hover:bg-orange-500 group-hover:text-white transition-colors flex-shrink-0">
-                            ${index + 1}
-                        </div>
-                        <div class="min-w-0 flex-1 pr-6">
-                            <h4 class="font-medium text-gray-200 truncate group-hover:text-white transition-colors">${chapter.title}</h4>
-                            <p class="text-xs text-gray-500 truncate mt-1">${previewText || '空内容'}</p>
-                        </div>
+                // Audio button
+                let audioBtnHTML;
+                if (chapter.has_audio) {
+                    audioBtnHTML = `
+                    <div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30 cursor-default" onclick="event.stopPropagation()">
+                            <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+                            已生成音频
+                        </button>
+                        <button class="p-1.5 text-slate-500 hover:text-primary transition-colors" onclick="event.stopPropagation(); goToChapter(${index})" title="播放">
+                            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1">play_arrow</span>
+                        </button>
+                    </div>`;
+                } else {
+                    audioBtnHTML = `
+                    <div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+                        <button data-chapter="${chapter.title}" onclick="generateSingleAudio(event, this)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold shadow-sm hover:bg-primary/90 transition-colors">
+                            <span class="material-symbols-outlined text-[15px]">volume_up</span>
+                            生成音频
+                        </button>
+                    </div>`;
+                }
+
+                // Podcast button
+                let podcastBtnHTML;
+                if (chapter.has_podcast) {
+                    podcastBtnHTML = `
+                    <div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30 cursor-default" onclick="event.stopPropagation()">
+                            <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">done_all</span>
+                            播客已就绪
+                        </button>
+                        <button data-chapter="${chapter.title}" onclick="generatePodcast(event, this, true)" class="flex items-center gap-1 px-2 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] uppercase font-black rounded border border-red-500/20 transition-colors">
+                            <span class="material-symbols-outlined text-[13px]">replay</span>
+                            重新生成
+                        </button>
+                    </div>`;
+                } else {
+                    podcastBtnHTML = `
+                    <div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+                        <button data-chapter="${chapter.title}" onclick="generatePodcast(event, this, false)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-bold border border-primary/20 hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-[15px]">groups</span>
+                            生成播客
+                        </button>
+                    </div>`;
+                }
+
+                const div = document.createElement('div');
+                div.className = "glass-panel glow-hover rounded-xl p-5 flex flex-col lg:flex-row lg:items-center gap-5 transition-all cursor-pointer";
+                div.innerHTML = `
+                <div class="flex-1 flex gap-4 min-w-0" onclick="goToChapter(${index})">
+                    <div class="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                        <span class="text-primary font-bold text-sm">${String(index + 1).padStart(2, '0')}</span>
                     </div>
-                    <div class="flex items-center gap-3 pl-12">
-                         ${audioBtnHTML}
-                         ${podcastBtnHTML}
+                    <div class="min-w-0 flex-1">
+                        <h4 class="text-base font-bold text-slate-100 mb-1 truncate">${chapter.title}</h4>
+                        <p class="text-slate-400 text-sm truncate">${previewText || '空内容'}</p>
                     </div>
-                `;
-                
-                li.onclick = () => {
-                    goToChapter(index);
-                };
-                
-                listEl.appendChild(li);
+                </div>
+                <div class="flex flex-wrap items-center gap-3 shrink-0">
+                    ${audioBtnHTML}
+                    ${podcastBtnHTML}
+                    <button class="p-2 text-slate-500 hover:text-slate-300 transition-colors" onclick="event.stopPropagation(); goToChapter(${index})">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
+                </div>
+            `;
+
+                listEl.appendChild(div);
             });
         }
 
@@ -219,13 +386,11 @@
         async function generateSingleAudio(event, btnElement) {
             event.stopPropagation();
             const chapterTitle = btnElement.getAttribute('data-chapter');
-            
+
             const originalHTML = btnElement.innerHTML;
             btnElement.disabled = true;
-            btnElement.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 制作中...`;
-            btnElement.classList.replace('bg-orange-500', 'bg-gray-500');
-            btnElement.classList.replace('hover:bg-orange-600', 'hover:bg-gray-600');
-            btnElement.classList.replace('shadow-orange-500/20', 'shadow-transparent');
+            btnElement.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin-slow">autorenew</span> 制作中...`;
+            btnElement.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/30 text-primary/60 text-xs font-bold cursor-not-allowed";
 
             try {
                 const response = await fetch('/api/generate_audio', {
@@ -233,12 +398,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ book_name: currentBookName, chapter_title: chapterTitle })
                 });
-                
+
                 const data = await response.json();
                 if (data.success) {
-                    btnElement.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 已完成`;
-                    btnElement.classList.replace('bg-gray-500', 'bg-green-500');
-                    btnElement.classList.replace('hover:bg-gray-600', 'hover:bg-green-600');
+                    btnElement.innerHTML = `<span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">check_circle</span> 已完成`;
+                    btnElement.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30 cursor-default";
                 } else {
                     throw new Error(data.error);
                 }
@@ -246,34 +410,25 @@
                 alert("生成音频失败: " + error.message);
                 btnElement.disabled = false;
                 btnElement.innerHTML = originalHTML;
-                btnElement.classList.replace('bg-gray-500', 'bg-orange-500');
-                btnElement.classList.replace('hover:bg-gray-600', 'hover:bg-orange-600');
-                btnElement.classList.replace('shadow-transparent', 'shadow-orange-500/20');
+                btnElement.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold shadow-sm hover:bg-primary/90 transition-colors";
             }
         }
 
         async function generatePodcast(event, btnElement, forceRecreate = false) {
             event.stopPropagation();
             const chapterTitle = btnElement.getAttribute('data-chapter');
-            
+
             if (forceRecreate) {
-                const confirmed = confirm(`确定要重新生成【${chapterTitle}】的播客吗？\\n这将会覆盖现有的对白脚本及音频文件。`);
+                const confirmed = confirm(`确定要重新生成【${chapterTitle}】的播客吗？\n这将会覆盖现有的对白脚本及音频文件。`);
                 if (!confirmed) return;
             }
-            
+
             const originalHTML = btnElement.innerHTML;
-            const originalClasses = Array.from(btnElement.classList);
-            
+            const originalClass = btnElement.className;
+
             btnElement.disabled = true;
-            btnElement.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 制作中...`;
-            
-            if (forceRecreate) {
-                btnElement.className = "px-3 py-1.5 text-white text-xs font-bold rounded flex items-center gap-1.5 shadow-lg bg-gray-600";
-            } else {
-                btnElement.classList.replace('bg-red-500', 'bg-gray-500');
-                btnElement.classList.replace('hover:bg-red-600', 'hover:bg-gray-600');
-                btnElement.classList.replace('shadow-red-500/20', 'shadow-transparent');
-            }
+            btnElement.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin-slow">autorenew</span> 制作中...`;
+            btnElement.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/20 text-primary/60 text-xs font-bold cursor-not-allowed";
 
             try {
                 const apiKey = localStorage.getItem('openai_api_key') || null;
@@ -283,8 +438,8 @@
                 const response = await fetch('/api/generate_podcast', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        book_name: currentBookName, 
+                    body: JSON.stringify({
+                        book_name: currentBookName,
                         chapter_title: chapterTitle,
                         api_key: apiKey,
                         api_base_url: apiBase,
@@ -292,15 +447,13 @@
                         force_recreate: forceRecreate
                     })
                 });
-                
+
                 const data = await response.json();
                 if (data.success) {
-                    btnElement.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 已完成`;
-                    btnElement.className = "px-3 py-1.5 text-white text-xs font-bold rounded flex items-center gap-1.5 shadow-lg bg-green-500";
-                    
-                    setTimeout(() => {
-                        loadBookDetails(currentBookName);
-                    }, 1500);
+                    btnElement.innerHTML = `<span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">done_all</span> 已完成`;
+                    btnElement.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30 cursor-default";
+
+                    setTimeout(() => { loadBookDetails(currentBookName); }, 1500);
                 } else {
                     throw new Error(data.error);
                 }
@@ -308,14 +461,14 @@
                 alert("生成 Podcast 失败: " + error.message);
                 btnElement.disabled = false;
                 btnElement.innerHTML = originalHTML;
-                btnElement.className = originalClasses.join(" ");
+                btnElement.className = originalClass;
             }
         }
 
         function checkCustomModel() {
             const select = document.getElementById('model-select');
             const customInput = document.getElementById('custom-model-input');
-            if(select.value === 'custom') {
+            if (select.value === 'custom') {
                 customInput.classList.remove('hidden');
             } else {
                 customInput.classList.add('hidden');
@@ -325,23 +478,20 @@
         function openSettings() {
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
-            
+
             document.getElementById('api-key-input').value = localStorage.getItem('openai_api_key') || '';
             document.getElementById('api-base-input').value = localStorage.getItem('openai_api_base_url') || '';
-            
+
             let storedModel = localStorage.getItem('openai_model') || 'gpt-4o-mini';
             const select = document.getElementById('model-select');
-            
+
             let found = false;
-            for(let i=0; i<select.options.length; i++) {
-                if(select.options[i].value === storedModel) {
-                    found = true;
-                    break;
-                }
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === storedModel) { found = true; break; }
             }
-            
+
             const customInput = document.getElementById('custom-model-input');
-            if(found && storedModel !== 'custom') {
+            if (found && storedModel !== 'custom') {
                 select.value = storedModel;
                 customInput.classList.add('hidden');
             } else {
@@ -349,7 +499,7 @@
                 customInput.value = storedModel === 'custom' ? '' : storedModel;
                 customInput.classList.remove('hidden');
             }
-            
+
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -360,37 +510,34 @@
         function closeSettings() {
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
-            
+
             modal.classList.add('opacity-0');
             content.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
         function saveSettings() {
             const apiKey = document.getElementById('api-key-input').value.trim();
             const apiBase = document.getElementById('api-base-input').value.trim();
-            
+
             const select = document.getElementById('model-select');
             let model = select.value;
-            if(model === 'custom') {
+            if (model === 'custom') {
                 model = document.getElementById('custom-model-input').value.trim();
             }
-            if(!model) model = 'gpt-4o-mini';
-            
-            if(apiKey) {
-                 localStorage.setItem('openai_api_key', apiKey);
-            }
-            if(apiBase) {
-                 localStorage.setItem('openai_api_base_url', apiBase);
+            if (!model) model = 'gpt-4o-mini';
+
+            if (apiKey) { localStorage.setItem('openai_api_key', apiKey); }
+            if (apiBase) {
+                localStorage.setItem('openai_api_base_url', apiBase);
             } else {
-                 localStorage.removeItem('openai_api_base_url');
+                localStorage.removeItem('openai_api_base_url');
             }
             localStorage.setItem('openai_model', model);
-            
+
             closeSettings();
         }
     </script>
 </body>
+
 </html>
