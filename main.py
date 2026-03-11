@@ -298,3 +298,14 @@ async def generate_chapter_podcast(req: AudioRequest):
 def read_root():
     from fastapi.responses import FileResponse
     return FileResponse("static/index.html")
+
+@app.get("/book.html")
+def read_book_html():
+    from fastapi.responses import FileResponse
+    return FileResponse("static/book.html")
+
+@app.get("/chapter.html")
+def read_chapter_html():
+    from fastapi.responses import FileResponse
+    return FileResponse("static/chapter.html")
+
