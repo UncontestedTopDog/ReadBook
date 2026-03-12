@@ -107,7 +107,7 @@ def read_book_details(book_name):
     }
 
 @app.post("/api/upload")
-async def upload_epub(file: UploadFile = File(...)):
+def upload_epub(file: UploadFile = File(...)):
     try:
         book_name = os.path.splitext(file.filename)[0]
         
@@ -186,7 +186,7 @@ class AudioRequest(BaseModel):
     force_recreate: Optional[bool] = False
 
 @app.post("/api/generate_audio")
-async def generate_chapter_audio(req: AudioRequest):
+def generate_chapter_audio(req: AudioRequest):
     try:
         base_chapters_dir = os.path.join(script_dir, "chapters")
         book_dir = os.path.join(base_chapters_dir, req.book_name)
@@ -203,7 +203,7 @@ async def generate_chapter_audio(req: AudioRequest):
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 
 @app.post("/api/generate_podcast")
-async def generate_chapter_podcast(req: AudioRequest):
+def generate_chapter_podcast(req: AudioRequest):
     try:
         base_chapters_dir = os.path.join(script_dir, "chapters")
         base_script_dir = os.path.join(script_dir, "script")
