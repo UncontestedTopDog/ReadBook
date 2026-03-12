@@ -127,6 +127,6 @@ if __name__ == "__main__":
     
     if not Path(args.script_path).exists():
         print(f"❌ Error: Script file not found at {args.script_path}")
-        sys.exit(1)
+        raise Exception(f"Script file not found at {args.script_path}")
         
     generate_podcast(args.script_path, args.out_dir, args.sub_dir)

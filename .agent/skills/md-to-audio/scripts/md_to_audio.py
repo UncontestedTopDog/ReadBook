@@ -11,7 +11,7 @@ def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None
     # 检查文件是否存在
     if not md_path.exists():
         print(f"❌ 错误：找不到文件 {md_file_path}")
-        sys.exit(1)
+        raise Exception(f"找不到文件 {md_file_path}")
         
     # 获取文件名（不带扩展名）
     file_name = md_path.stem
@@ -65,10 +65,10 @@ def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None
         
     except subprocess.CalledProcessError as e:
         print(f"\n❌ 转换失败，错误信息: {e}")
-        sys.exit(1)
+        raise Exception(f"edge-tts 转换失败: {e}")
     except FileNotFoundError:
         print("\n❌ 错误：找不到 'edge-tts' 命令。")
-        sys.exit(1)
+        raise Exception("系统找不到 'edge-tts' 命令，请确保已安装 edge-tts。")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="将 Markdown 文件转换为 MP3 音频 (使用 edge-tts)")

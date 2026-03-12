@@ -5,7 +5,7 @@ if [ ! -d ".venv" ]; then
     echo "正在创建虚拟环境并安装依赖..."
     python3 -m venv .venv
     source .venv/bin/activate
-    pip install fastapi uvicorn python-multipart
+    pip install fastapi uvicorn python-multipart edge-tts openai python-dotenv
 else
     source .venv/bin/activate
 fi

@@ -8,6 +8,10 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <script id="tailwind-config">
@@ -56,6 +60,29 @@
             }
         }
 
+        .sortable-ghost {
+            opacity: 0.3;
+            background: rgba(255, 87, 34, 0.1) !important;
+            border: 2px dashed #ff5722 !important;
+        }
+
+        .sortable-drag {
+            cursor: grabbing !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .drag-handle {
+            cursor: grab;
+        }
+
+        .sorting-mode .chapter-item {
+            cursor: grab;
+        }
+
+        .sorting-mode .chapter-item:active {
+            cursor: grabbing;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -73,6 +100,27 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        :fullscreen #mindmap-view {
+            height: 100vh !important;
+            width: 100vw !important;
+            background: radial-gradient(circle at top right, #1a1032, #0a0a1a);
+            padding: 20px;
+        }
+
+        :fullscreen #markmap-svg {
+            border: none;
+            background: transparent;
+        }
     </style>
 </head>
 
@@ -81,23 +129,11 @@
         <!-- Header -->
         <header
             class="flex items-center justify-between px-6 py-4 border-b border-white/10 glass-panel sticky top-0 z-50">
-            <a class="flex items-center gap-3 cursor-pointer group" onclick="window.location.href='/'">
-                <span class="text-2xl group-hover:scale-110 transition-transform">📚</span>
-                <h1 class="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">拆书工坊
-                </h1>
+            <a class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-xl transition-all cursor-pointer group border border-white/10"
+                onclick="window.location.href='/'" title="回到首页">
+                <span
+                    class="material-symbols-outlined text-2xl text-white group-hover:text-primary transition-all">home</span>
             </a>
-            <div class="flex items-center gap-4">
-                <button onclick="window.location.href='/'"
-                    class="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
-                    title="返回主页">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </button>
-                <button onclick="openSettings()"
-                    class="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-                    <span class="material-symbols-outlined text-[20px]">settings</span>
-                    <span>配置中心</span>
-                </button>
-            </div>
         </header>
 
         <main class="flex-1 flex flex-col lg:flex-row gap-6 p-6 max-w-[1400px] mx-auto w-full">
@@ -105,78 +141,130 @@
             <div id="loading-panel" class="w-full flex flex-col items-center justify-center py-32">
                 <div class="relative w-16 h-16 mb-6">
                     <div class="absolute inset-0 border-4 border-white/10 rounded-full"></div>
-                    <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin">
+                    <div
+                        class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin">
                     </div>
                 </div>
                 <p class="text-lg font-medium text-primary/80 animate-pulse">正在加载书籍信息...</p>
             </div>
 
             <!-- Left Panel: Book Profile (hidden by default) -->
-            <aside id="book-profile-panel" class="hidden w-full lg:w-[380px] flex flex-col gap-6 opacity-0 transition-opacity duration-500">
+            <aside id="book-profile-panel"
+                class="hidden w-full lg:w-[380px] flex flex-col gap-6 opacity-0 transition-opacity duration-500">
                 <div class="glass-panel rounded-3xl p-6 flex flex-col items-center text-center">
-                    <div class="w-56 h-80 rounded-xl overflow-hidden shadow-2xl shadow-primary/20 mb-6 border border-white/10">
+                    <div
+                        class="w-56 h-80 rounded-xl overflow-hidden shadow-2xl shadow-primary/20 mb-6 border border-white/10">
                         <img id="book-cover" class="w-full h-full object-cover" src="" alt="书籍封面">
                     </div>
                     <h2 id="book-title" class="text-2xl font-bold text-white mb-1">加载中...</h2>
                     <p id="book-author" class="text-primary font-medium mb-6">获取中...</p>
-                    
+
                     <div class="grid grid-cols-2 gap-3 w-full mb-6">
-                        <div class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
+                        <div
+                            class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
                             <span id="stat-chapters" class="text-2xl font-bold text-white">0</span>
                             <span class="text-xs text-slate-500 uppercase tracking-wider">章节总数</span>
                         </div>
-                        <div class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
+                        <div
+                            class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
                             <span id="stat-audios" class="text-2xl font-bold text-white">0</span>
                             <span class="text-xs text-slate-500 uppercase tracking-wider">完成音频</span>
                         </div>
-                        <div class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
+                        <div
+                            class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
                             <span id="stat-podcasts" class="text-2xl font-bold text-white">0</span>
                             <span class="text-xs text-slate-500 uppercase tracking-wider">播客数量</span>
                         </div>
-                        <div class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
+                        <div
+                            class="glass-panel rounded-xl p-3 flex flex-col items-center justify-center border-white/5">
                             <span id="stat-status" class="text-sm font-bold text-green-500">就绪</span>
                             <span class="text-xs text-slate-500 uppercase tracking-wider">解析状态</span>
                         </div>
                     </div>
-                    
-                    <button onclick="startReading()" class="w-full py-4 rounded-2xl bg-white text-background-dark font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors">
+
+                    <button onclick="startReading()"
+                        class="w-full py-4 rounded-2xl bg-white text-background-dark font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors">
                         <span class="material-symbols-outlined">auto_stories</span>
                         开始阅读
                     </button>
                 </div>
 
-                <!-- Summary Panel -->
-                <div class="glass-panel rounded-3xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary">description</span>
-                        书籍简介
-                    </h3>
-                    <p id="book-description" class="text-slate-400 text-sm leading-relaxed">
-                        暂无书籍简介。此书已成功拆解，您可以点击右侧章节查看内容并生成配套音频。
-                    </p>
-                </div>
+
             </aside>
 
             <!-- Right Panel: Chapter List (hidden by default) -->
-            <section id="content-panel" class="hidden flex-1 glass-panel rounded-3xl overflow-hidden flex flex-col opacity-0 transition-opacity duration-500 lg:h-[calc(100vh-120px)]">
-                <div class="flex items-center gap-8 px-8 py-4 border-b border-white/10 overflow-x-auto no-scrollbar shrink-0">
-                    <button class="relative pb-4 text-primary font-bold text-sm tracking-wide transition-all whitespace-nowrap">
-                        章节列表
-                        <span class="absolute bottom-[-1px] left-0 w-full h-0.5 bg-primary rounded-full"></span>
-                    </button>
-                    <button class="pb-4 text-slate-400 hover:text-white font-medium text-sm tracking-wide transition-all whitespace-nowrap">
-                        精彩书摘
-                    </button>
-                    <button class="pb-4 text-slate-400 hover:text-white font-medium text-sm tracking-wide transition-all whitespace-nowrap">
-                        播客音频
-                    </button>
-                    <button class="pb-4 text-slate-400 hover:text-white font-medium text-sm tracking-wide transition-all whitespace-nowrap">
-                        思维导图
-                    </button>
+            <section id="content-panel"
+                class="hidden flex-1 glass-panel rounded-3xl overflow-hidden flex flex-col opacity-0 transition-opacity duration-500 lg:h-[calc(100vh-120px)]">
+                <div class="flex items-center justify-between px-8 py-4 border-b border-white/10 shrink-0">
+                    <div class="flex items-center gap-8 no-scrollbar">
+                        <button id="tab-chapters" onclick="switchTab('chapters')"
+                            class="relative pb-4 text-primary font-bold text-sm tracking-wide transition-all whitespace-nowrap">
+                            章节列表
+                            <span class="absolute bottom-[-1px] left-0 w-full h-0.5 bg-primary rounded-full"></span>
+                        </button>
+                        <button id="tab-mindmap" onclick="switchTab('mindmap')"
+                            class="relative pb-4 text-slate-400 font-medium text-sm tracking-wide transition-all whitespace-nowrap">
+                            思维导图
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-4">
+                        <button id="btn-toggle-sort" onclick="toggleSortMode()"
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400 text-xs font-bold hover:bg-white/10 transition-all">
+                            <span class="material-symbols-outlined text-[18px]">sort</span>
+                            <span>手动排序</span>
+                        </button>
+                        <button id="btn-save-sort" onclick="saveNewOrder()"
+                            class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-green-500/20">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            <span>保存顺序</span>
+                        </button>
+                        <button id="btn-ai-sort" onclick="takeAiSort()"
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all">
+                            <span class="material-symbols-outlined text-[18px]">psychology</span>
+                            <span>AI 智能排序</span>
+                        </button>
+                        <button id="btn-cancel-sort" onclick="cancelSort()"
+                            class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
+                            <span>取消</span>
+                        </button>
+                    </div>
                 </div>
-                
-                <div id="chapter-list" class="flex-1 overflow-y-auto p-6 space-y-4">
+
+                <div id="chapter-list" class="flex-1 overflow-y-auto p-6 space-y-4 tab-content">
                     <!-- Chapter items will be injected here -->
+                </div>
+
+                <div id="mindmap-container" class="flex-1 flex flex-col p-8 hidden tab-content">
+                    <div id="mindmap-empty"
+                        class="flex flex-col items-center justify-center py-20 text-center space-y-6">
+                        <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-4xl text-slate-500">account_tree</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold text-white mb-2">尚未生成思维导图</h4>
+                            <p class="text-slate-500 max-w-sm">通过 AI 深度分析全书内容，为您提取核心架构和知识脉络。</p>
+                        </div>
+                        <button id="btn-generate-mindmap" onclick="generateMindmap()"
+                            class="px-8 py-3 rounded-xl bg-primary text-white font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
+                            <span class="material-symbols-outlined">psychology</span>
+                            立即生成思维导图
+                        </button>
+                    </div>
+                    <div id="mindmap-loading" class="hidden flex flex-col items-center justify-center py-20">
+                        <div
+                            class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4">
+                        </div>
+                        <p class="text-primary font-medium">AI 正在深度分析并构建导图...</p>
+                    </div>
+                    <div id="mindmap-view" class="hidden w-full flex-1 flex justify-center relative group">
+                        <svg id="markmap-svg" class="w-full h-full bg-white/5 rounded-2xl border border-white/10"></svg>
+                        <button onclick="toggleMindmapFullscreen()"
+                            class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md border border-white/10"
+                            title="全屏显示">
+                            <span class="material-symbols-outlined" id="fs-icon">fullscreen</span>
+                        </button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -248,6 +336,9 @@
     <script>
         let currentBookName = null;
         let currentBookDetails = null;
+        let isSortingMode = false;
+        let currentTab = 'chapters';
+        let sortableInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
@@ -279,7 +370,7 @@
         function renderResult(data) {
             currentBookDetails = data;
             document.title = `${data.book_name} - 拆书工坊`;
-            
+
             // Hide loading
             document.getElementById('loading-panel').classList.add('hidden');
 
@@ -288,10 +379,10 @@
             const contentPanel = document.getElementById('content-panel');
             profilePanel.classList.remove('hidden');
             contentPanel.classList.remove('hidden');
-            
-            setTimeout(() => { 
-                profilePanel.classList.remove('opacity-0'); 
-                contentPanel.classList.remove('opacity-0'); 
+
+            setTimeout(() => {
+                profilePanel.classList.remove('opacity-0');
+                contentPanel.classList.remove('opacity-0');
             }, 50);
 
             // Populate Book Info
@@ -303,11 +394,7 @@
             }
 
             document.getElementById('book-title').innerText = data.book_name || "未知书名";
-            // Author logic (try to extract from name or metadata if available, else placeholder)
             document.getElementById('book-author').innerText = data.author || "佚名";
-            if (data.description) {
-                document.getElementById('book-description').innerText = data.description;
-            }
 
             // Stats
             const chapters = data.chapters || [];
@@ -322,70 +409,343 @@
             const listEl = document.getElementById('chapter-list');
             listEl.innerHTML = '';
 
+            if (isSortingMode) {
+                listEl.classList.add('sorting-mode');
+            } else {
+                listEl.classList.remove('sorting-mode');
+            }
+
             chapters.forEach((chapter, index) => {
-                const chapterNo = String(index + 1).padStart(2, '0');
-                
-                // Status badges
-                let badgeHTML = '';
-                if (chapter.has_audio) {
-                    badgeHTML += `
-                        <span class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-[12px] fill-1">check_circle</span>
-                            音频就绪
-                        </span>`;
-                }
-                if (chapter.has_podcast) {
-                    badgeHTML += `
-                        <span class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-[12px] fill-1">podcasts</span>
-                            播客可听
-                        </span>`;
-                }
+                const div = document.createElement('div');
+                div.id = `chapter-item-${index}`;
+                div.className = `chapter-item group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 ${isSortingMode ? 'border-primary/30 bg-primary/5' : 'border-white/5 bg-white/3 hover:bg-white/5 hover:border-white/20'}`;
+                div.setAttribute('data-title', chapter.title);
+
+                div.onclick = () => {
+                    if (!isSortingMode) goToChapter(index);
+                };
+
+                const hasAudio = chapter.has_audio;
+                const hasPodcast = chapter.has_podcast;
 
                 // Action buttons
                 let actionsHTML = '';
-                if (chapter.has_audio) {
+                if (!isSortingMode) {
+                    if (hasAudio) {
+                        actionsHTML += `
+                            <button onclick="event.stopPropagation(); goToChapter(${index})" class="px-4 py-2 rounded-lg bg-primary text-white text-xs font-bold hover:brightness-110 transition-all">
+                                收听
+                            </button>`;
+                    } else {
+                        actionsHTML += `
+                            <button onclick="generateSingleAudio(event, this)" data-chapter="${chapter.title}" class="px-4 py-2 rounded-lg bg-white/5 text-slate-400 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
+                                生成音频
+                            </button>`;
+                    }
                     actionsHTML += `
-                        <button onclick="event.stopPropagation(); goToChapter(${index})" class="px-4 py-2 rounded-lg bg-primary text-white text-xs font-bold hover:brightness-110 transition-all">
-                            收听
-                        </button>`;
-                } else {
-                    actionsHTML += `
-                        <button onclick="generateSingleAudio(event, this)" data-chapter="${chapter.title}" class="px-4 py-2 rounded-lg bg-white/5 text-slate-400 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
-                            生成音频
+                        <button onclick="event.stopPropagation(); goToChapter(${index})" class="px-4 py-2 rounded-lg bg-white/5 text-slate-300 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
+                            生成播客
                         </button>`;
                 }
-                
-                // Secondary action
-                actionsHTML += `
-                        <button onclick="event.stopPropagation(); goToChapter(${index})" class="px-4 py-2 rounded-lg bg-white/5 text-slate-300 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
-                            生成博客
-                        </button>`;
 
-                const div = document.createElement('div');
-                div.className = "group glass-panel border-white/5 p-5 rounded-2xl flex items-center gap-5 hover:bg-white/[0.06] hover:border-primary/30 transition-all duration-300 cursor-pointer";
-                div.onclick = () => goToChapter(index);
-                
                 div.innerHTML = `
-                    <div class="flex-shrink-0 w-12 h-12 rounded-xl ${chapter.has_audio ? 'bg-primary/10 text-primary' : 'bg-white/5 text-slate-500'} flex items-center justify-center font-bold text-lg">
-                        ${chapterNo}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-2">
-                            <h4 class="text-white font-bold text-lg group-hover:text-primary transition-colors truncate">${chapter.title}</h4>
-                            <div class="flex gap-2 shrink-0">
-                                ${badgeHTML}
+                    <div class="flex items-center gap-5">
+                        ${isSortingMode ? `
+                            <span class="material-symbols-outlined text-primary/50 drag-handle">drag_indicator</span>
+                        ` : `
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 font-bold text-sm">
+                                ${index + 1}
+                            </div>
+                        `}
+                        <div class="flex flex-col">
+                            <h4 class="text-white font-bold tracking-tight group-hover:text-primary transition-colors">${chapter.title}</h4>
+                            <div class="flex items-center gap-3 mt-1.5">
+                                ${hasAudio ? `<span class="flex items-center gap-1 text-[10px] text-green-400 font-bold uppercase tracking-wider bg-green-400/10 px-2 py-0.5 rounded-full"><span class="material-symbols-outlined text-[12px]">volume_up</span> AUDIO</span>` : ''}
+                                ${hasPodcast ? `<span class="flex items-center gap-1 text-[10px] text-primary font-bold uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded-full"><span class="material-symbols-outlined text-[12px]">mic_external_on</span> PODCAST</span>` : ''}
                             </div>
                         </div>
-                        <p class="text-slate-500 text-sm truncate max-w-md"></p>
                     </div>
-                    <div class="flex flex-col gap-2 shrink-0 ml-auto">
+                    <div class="flex items-center gap-2 shrink-0 ml-auto">
                         ${actionsHTML}
                     </div>
                 `;
 
                 listEl.appendChild(div);
             });
+
+            // Initialize mindmap state
+            renderMindmapState();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // UI Toggle
+            const tabs = {
+                'chapters': {
+                    btn: 'tab-chapters',
+                    panel: 'chapter-list',
+                    sortPanel: document.querySelector('.flex.items-center.gap-3.mb-4')
+                },
+                'mindmap': {
+                    btn: 'tab-mindmap',
+                    panel: 'mindmap-container',
+                    sortPanel: document.querySelector('.flex.items-center.gap-3.mb-4')
+                }
+            };
+
+            Object.keys(tabs).forEach(t => {
+                const b = document.getElementById(tabs[t].btn);
+                const p = document.getElementById(tabs[t].panel);
+                if (t === tab) {
+                    b.classList.add('text-primary', 'font-bold');
+                    b.classList.remove('text-slate-400', 'font-medium');
+                    if (!b.querySelector('span')) {
+                        b.innerHTML += '<span class="absolute bottom-[-1px] left-0 w-full h-0.5 bg-primary rounded-full"></span>';
+                    }
+                    p.classList.remove('hidden');
+                } else {
+                    b.classList.remove('text-primary', 'font-bold');
+                    b.classList.add('text-slate-400', 'font-medium');
+                    const s = b.querySelector('span');
+                    if (s) s.remove();
+                    p.classList.add('hidden');
+                }
+            });
+
+            // Hide sort buttons in mindmap tab
+            const sortPanel = document.getElementById('btn-toggle-sort').parentElement;
+            if (tab === 'mindmap') {
+                sortPanel.classList.add('invisible');
+            } else {
+                sortPanel.classList.remove('invisible');
+            }
+
+            if (tab === 'mindmap') {
+                renderMindmapState();
+            }
+        }
+
+        function renderMindmapState() {
+            const empty = document.getElementById('mindmap-empty');
+            const view = document.getElementById('mindmap-view');
+            const svg = document.getElementById('markmap-svg');
+
+            if (currentBookDetails.has_mindmap && currentBookDetails.mindmap) {
+                empty.classList.add('hidden');
+                view.classList.remove('hidden');
+
+                // Clear and render with Markmap
+                svg.innerHTML = '';
+                try {
+                    const { Transformer, Markmap } = window.markmap;
+                    const transformer = new Transformer();
+                    const markdown = currentBookDetails.mindmap;
+                    const { root } = transformer.transform(markdown);
+                    // Store latest markmap instance for refitting
+                    window.currentMarkmap = Markmap.create(svg, {
+                        autoFit: true,
+                        duration: 500,
+                        style: (id) => `
+                            .${id} { font-family: inherit; }
+                            .${id} text { fill: #f8fafc !important; }
+                            .${id} div { color: #f8fafc !important; }
+                            .${id} .markmap-node { cursor: pointer; }
+                        `
+                    }, root);
+                } catch (e) {
+                    console.error("Markmap rendering error:", e);
+                }
+            } else {
+                empty.classList.remove('hidden');
+                view.classList.add('hidden');
+            }
+        }
+
+        function toggleMindmapFullscreen() {
+            const container = document.getElementById('mindmap-view');
+            const icon = document.getElementById('fs-icon');
+
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    alert(`全屏失败: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fs-icon');
+            if (document.fullscreenElement) {
+                icon.innerText = 'fullscreen_exit';
+            } else {
+                icon.innerText = 'fullscreen';
+            }
+            // If we have a markmap instance, refit it to the new size
+            if (window.currentMarkmap) {
+                setTimeout(() => window.currentMarkmap.fit(), 300);
+            }
+        });
+
+        async function generateMindmap() {
+            document.getElementById('mindmap-empty').classList.add('hidden');
+            document.getElementById('mindmap-loading').classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/generate_mindmap', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        book_name: currentBookName,
+                        api_key: localStorage.getItem('openai_api_key'),
+                        api_base_url: localStorage.getItem('openai_api_base_url'),
+                        model_name: localStorage.getItem('openai_model')
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    currentBookDetails.has_mindmap = true;
+                    currentBookDetails.mindmap = data.mindmap;
+                    renderMindmapState();
+                } else {
+                    let errMsg = data.error;
+                    if (!errMsg && data.detail) {
+                        errMsg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+                    }
+                    alert("生成失败：" + (errMsg || "未知错误"));
+                    document.getElementById('mindmap-empty').classList.remove('hidden');
+                }
+            } catch (err) {
+                alert("网络错误：" + err.message);
+                document.getElementById('mindmap-empty').classList.remove('hidden');
+            } finally {
+                document.getElementById('mindmap-loading').classList.add('hidden');
+            }
+        }
+
+        function toggleSortMode() {
+            setSortMode(!isSortingMode);
+        }
+
+        function setSortMode(active) {
+            isSortingMode = active;
+            const btnSort = document.getElementById('btn-toggle-sort');
+            const btnSave = document.getElementById('btn-save-sort');
+            const btnCancel = document.getElementById('btn-cancel-sort');
+            const btnAi = document.getElementById('btn-ai-sort');
+            const listEl = document.getElementById('chapter-list');
+
+            if (isSortingMode) {
+                btnSort.innerHTML = `<span class="material-symbols-outlined text-[18px]">check</span><span>正在排序...</span>`;
+                btnSort.classList.replace('text-slate-400', 'text-primary');
+                btnSave.classList.remove('hidden');
+                btnCancel.classList.remove('hidden');
+                btnAi.classList.add('hidden');
+
+                // Initialize Sortable
+                sortableInstance = new Sortable(listEl, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    handle: '.drag-handle',
+                    delay: 100,
+                    delayOnTouchOnly: true
+                });
+            } else {
+                btnSort.innerHTML = `<span class="material-symbols-outlined text-[18px]">sort</span><span>手动排序</span>`;
+                btnSort.classList.replace('text-primary', 'text-slate-400');
+                btnSave.classList.add('hidden');
+                btnCancel.classList.add('hidden');
+                btnAi.classList.remove('hidden');
+
+                if (sortableInstance) {
+                    sortableInstance.destroy();
+                    sortableInstance = null;
+                }
+            }
+
+            renderResult(currentBookDetails);
+        }
+
+        async function takeAiSort() {
+            const btnAi = document.getElementById('btn-ai-sort');
+            const originalHTML = btnAi.innerHTML;
+            btnAi.disabled = true;
+            btnAi.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span><span>AI 正在排序...</span>`;
+
+            try {
+                const res = await fetch('/api/ai_sort', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        book_name: currentBookName,
+                        api_key: localStorage.getItem('openai_api_key'),
+                        api_base_url: localStorage.getItem('openai_api_base_url'),
+                        model_name: localStorage.getItem('openai_model')
+                    })
+                });
+                const data = await res.json();
+                if (data.success && data.order) {
+                    // 自动调用保存接口
+                    const saveRes = await fetch(`/api/books/${encodeURIComponent(currentBookName)}/order`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            book_name: currentBookName,
+                            order: data.order
+                        })
+                    });
+                    const saveData = await saveRes.json();
+
+                    if (saveData.success) {
+                        alert("AI 智能排序并保存成功！");
+                        loadBookDetails(currentBookName); // 重新加载数据
+                    } else {
+                        alert("保存 AI 排序失败：" + saveData.error);
+                    }
+                } else {
+                    alert("AI 排序失败：" + (data.error || "未知原因"));
+                }
+            } catch (err) {
+                alert("网络错误：" + err.message);
+            } finally {
+                btnAi.disabled = false;
+                btnAi.innerHTML = originalHTML;
+            }
+        }
+
+        function cancelSort() {
+            setSortMode(false);
+            // 重新加载数据，以恢复原始排序（舍弃页面上未保存的拖拽变动）
+            loadBookDetails(currentBookName);
+        }
+
+        async function saveNewOrder() {
+            const listEl = document.getElementById('chapter-list');
+            const items = listEl.querySelectorAll('.chapter-item');
+            const newOrder = Array.from(items).map(item => item.getAttribute('data-title'));
+
+            try {
+                const res = await fetch(`/api/books/${encodeURIComponent(currentBookName)}/order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        book_name: currentBookName,
+                        order: newOrder
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("排序保存成功！");
+                    setSortMode(false);
+                    loadBookDetails(currentBookName);
+                } else {
+                    alert("保存失败：" + data.error);
+                }
+            } catch (err) {
+                alert("网络错误：" + err.message);
+            }
         }
 
         function startReading() {
@@ -405,7 +765,7 @@
             const originalHTML = btnElement.innerHTML;
             btnElement.disabled = true;
             btnElement.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin-slow">autorenew</span>`;
-            
+
             try {
                 const response = await fetch('/api/generate_audio', {
                     method: 'POST',

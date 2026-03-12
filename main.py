@@ -54,6 +54,9 @@ app.mount("/subtitles", StaticFiles(directory="subtitles"), name="subtitles")
 os.makedirs("podcast_subtitles", exist_ok=True)
 app.mount("/podcast_subtitles", StaticFiles(directory="podcast_subtitles"), name="podcast_subtitles")
 
+os.makedirs("mindmap", exist_ok=True)
+app.mount("/mindmap", StaticFiles(directory="mindmap"), name="mindmap")
+
 def read_book_details(book_name):
     base_chapters_dir = os.path.join(script_dir, "chapters")
     book_dir = os.path.join(base_chapters_dir, book_name)
@@ -61,10 +64,20 @@ def read_book_details(book_name):
     if not os.path.exists(book_dir):
         return None
         
-    chapters = []
+    # Load custom order if exists
+    order_path = os.path.join(book_dir, "order.json")
+    custom_order = []
+    if os.path.exists(order_path):
+        try:
+            with open(order_path, "r", encoding="utf-8") as f:
+                custom_order = json.load(f)
+        except:
+            pass
+
+    raw_chapters = {}
     cover_base64 = None
     
-    for filename in sorted(os.listdir(book_dir)):
+    for filename in os.listdir(book_dir):
         filepath = os.path.join(book_dir, filename)
         if filename.startswith("cover."):
             with open(filepath, "rb") as f:
@@ -92,18 +105,48 @@ def read_book_details(book_name):
                         
             with open(filepath, "r", encoding="utf-8") as f:
                 content = f.read()
-                chapters.append({
+                raw_chapters[chapter_title] = {
                     "title": chapter_title,
                     "content": content,
                     "podcast_content": podcast_script_content,
                     "has_audio": has_audio,
                     "has_podcast": has_podcast
-                })
+                }
+    
+    # Apply custom order or default sorted
+    chapters = []
+    if custom_order:
+        for title in custom_order:
+            if title in raw_chapters:
+                chapters.append(raw_chapters.pop(title))
+    
+    # Add remaining chapters sorted by name
+    remaining_titles = sorted(raw_chapters.keys())
+    for title in remaining_titles:
+        chapters.append(raw_chapters[title])
                 
+    # 检查思维导图是否已生成
+    mindmap_dir = os.path.join(script_dir, "mindmap", book_name)
+    mindmap_path = os.path.join(mindmap_dir, f"{book_name}_MindMap.md")
+    
+    # 兼容旧路径检查 (如果旧路径存在且新路径不存在，则自动迁移)
+    old_mindmap_path = os.path.join(book_dir, "mindmap.md")
+    if os.path.exists(old_mindmap_path) and not os.path.exists(mindmap_path):
+        os.makedirs(mindmap_dir, exist_ok=True)
+        shutil.move(old_mindmap_path, mindmap_path)
+
+    has_mindmap = os.path.exists(mindmap_path)
+    mindmap_content = None
+    if has_mindmap:
+        with open(mindmap_path, "r", encoding="utf-8") as f:
+            mindmap_content = f.read()
+
     return {
         "book_name": book_name,
         "cover": cover_base64,
-        "chapters": chapters
+        "chapters": chapters,
+        "has_mindmap": has_mindmap,
+        "mindmap": mindmap_content
     }
 
 @app.post("/api/upload")
@@ -177,9 +220,29 @@ async def get_book(book_name: str):
     else:
         return JSONResponse({"success": False, "error": "Book not found"})
 
+class OrderRequest(BaseModel):
+    book_name: str
+    order: list[str]
+
+@app.post("/api/books/{book_name}/order")
+async def save_book_order(book_name: str, req: OrderRequest):
+    try:
+        base_chapters_dir = os.path.join(script_dir, "chapters")
+        book_dir = os.path.join(base_chapters_dir, book_name)
+        if not os.path.exists(book_dir):
+            return JSONResponse({"success": False, "error": "Book not found"}, status_code=404)
+        
+        order_path = os.path.join(book_dir, "order.json")
+        with open(order_path, "w", encoding="utf-8") as f:
+            json.dump(req.order, f, ensure_ascii=False, indent=2)
+            
+        return JSONResponse({"success": True, "message": "排序已保存"})
+    except Exception as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
 class AudioRequest(BaseModel):
     book_name: str
-    chapter_title: str
+    chapter_title: Optional[str] = None
     api_key: Optional[str] = None
     model_name: Optional[str] = None
     api_base_url: Optional[str] = None
@@ -197,7 +260,70 @@ def generate_chapter_audio(req: AudioRequest):
         
         # 调用技能进行音频转换和VTT提取
         convert_md_to_audio(md_file_path, subtitles=True)
-        return JSONResponse({"success": True, "message": "音频及字母生成成功"})
+        return JSONResponse({"success": True, "message": "音频及字幕生成成功"})
+        
+    except Exception as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
+@app.post("/api/generate_mindmap")
+def generate_book_mindmap(req: AudioRequest):
+    try:
+        base_chapters_dir = os.path.join(script_dir, "chapters")
+        book_dir = os.path.join(base_chapters_dir, req.book_name)
+        mindmap_dir = os.path.join(script_dir, "mindmap", req.book_name)
+        os.makedirs(mindmap_dir, exist_ok=True)
+        mindmap_path = os.path.join(mindmap_dir, f"{req.book_name}_MindMap.md")
+        
+        # 借助 AI 生成全书思维导图 (Mermaid 格式)
+        api_key = req.api_key or os.getenv("OPENAI_API_KEY")
+        api_base_url = req.api_base_url or os.getenv("OPENAI_API_BASE")
+        
+        if not api_key or api_key == "在这里填入你的API_KEY":
+            return JSONResponse({
+                "success": False, 
+                "error": "未配置 API_KEY！\n请在网页顶部的「⚙️ 设置模型」中填入你的 API KEY。"
+            }, status_code=400)
+            
+        # 读取所有章节标题和前几行作为摘要
+        context_parts = []
+        for filename in sorted(os.listdir(book_dir)):
+            if filename.endswith(".md") and filename != "mindmap.md":
+                with open(os.path.join(book_dir, filename), "r", encoding="utf-8") as f:
+                    content = f.read()
+                    context_parts.append(f"章节: {filename.replace('.md', '')}\n内容摘要: {content[:500]}...")
+        
+        source_context = "\n\n".join(context_parts)
+
+        prompt = f"""
+请根据以下书籍章节内容摘要，生成一个精炼的书籍思维导图。
+要求：
+1. 使用标准 Markdown 语法（使用 # 表示核心主题，## 表示章节/主要模块，### 表示子点，- 表示具体细节）。
+2. 结构要严谨且丰富，涵盖书中的核心逻辑、关键方法论和独特见解。
+3. 请只输出 Markdown 内容即可，不要包含 ```markdown 这种代码块包装，也不要任何解释。
+
+书籍名称：{req.book_name}
+内容如下：
+{source_context}
+"""
+        model_name = req.model_name or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        client_kwargs = {"api_key": api_key}
+        if api_base_url:
+            client_kwargs["base_url"] = api_base_url
+        client = OpenAI(**client_kwargs)
+        
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": "你是一个擅长提炼书籍精华和制作思维导图的专家。"},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        mindmap_content = response.choices[0].message.content
+        
+        with open(mindmap_path, "w", encoding="utf-8") as f:
+            f.write(mindmap_content)
+            
+        return JSONResponse({"success": True, "mindmap": mindmap_content})
         
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
@@ -291,6 +417,85 @@ def generate_chapter_podcast(req: AudioRequest):
         generate_podcast(md_script_path, out_audio_dir, out_sub_dir)
         return JSONResponse({"success": True, "message": "Podcast及字幕生成成功"})
         
+    except Exception as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
+@app.post("/api/ai_sort")
+async def ai_smart_sort(req: AudioRequest):
+    try:
+        base_chapters_dir = os.path.join(script_dir, "chapters")
+        book_dir = os.path.join(base_chapters_dir, req.book_name)
+        if not os.path.exists(book_dir):
+            return JSONResponse({"success": False, "error": "Book not found"}, status_code=404)
+        
+        # 获取所有待排序的章节标题
+        chapter_titles = []
+        for filename in os.listdir(book_dir):
+            if filename.endswith(".md") and filename != "mindmap.md":
+                chapter_titles.append(filename.replace(".md", ""))
+        
+        if not chapter_titles:
+            return JSONResponse({"success": False, "error": "No chapters found"}, status_code=404)
+
+        # 调 AI 进行逻辑排序
+        api_key = req.api_key or os.getenv("OPENAI_API_KEY")
+        api_base_url = req.api_base_url or os.getenv("OPENAI_API_BASE")
+        
+        if not api_key or api_key == "在这里填入你的API_KEY":
+            return JSONResponse({
+                "success": False, 
+                "error": "未配置 API_KEY！\n请在网页顶部的「⚙️ 设置模型」中填入你的 API KEY。"
+            }, status_code=400)
+
+        prompt = f"""
+你是一个专业的书籍编辑。请根据以下书籍《{req.book_name}》的章节标题，结合内容逻辑（如：开篇、论据、结论、或时间线），给出一个最合理的阅读排序。
+
+待排序章节列表：
+{json.dumps(chapter_titles, ensure_ascii=False)}
+
+要求：
+1. 请直接返回一个 JSON 数组，包含所有原始章节名称。
+2. 不要输出任何解释说明文字。
+3. 确保包含列表中的每一个章节，不要遗漏。
+"""
+        model_name = req.model_name or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        client_kwargs = {"api_key": api_key}
+        if api_base_url:
+            client_kwargs["base_url"] = api_base_url
+        client = OpenAI(**client_kwargs)
+        
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": "你是一个书籍内容排版专家。请只返回 JSON 数组格式的结果。"},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={ "type": "json_object" } if "gpt-4" in model_name or "gpt-3.5" in model_name else None
+        )
+        
+        content = response.choices[0].message.content.strip()
+        # 尝试解析 JSON。有的模型可能会返回 {"order": [...]} 或直接 [...]
+        try:
+            data = json.loads(content)
+            if isinstance(data, dict) and "order" in data:
+                sorted_titles = data["order"]
+            elif isinstance(data, list):
+                sorted_titles = data
+            elif isinstance(data, dict):
+                # 寻找第一个列表类型的 key
+                sorted_titles = next((v for v in data.values() if isinstance(v, list)), chapter_titles)
+            else:
+                sorted_titles = chapter_titles
+        except:
+            # 兜底：如果解析失败，尝试提取数组部分
+            import re
+            match = re.search(r'\[.*\]', content, re.DOTALL)
+            if match:
+                sorted_titles = json.loads(match.group())
+            else:
+                sorted_titles = chapter_titles
+
+        return JSONResponse({"success": True, "order": sorted_titles})
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 

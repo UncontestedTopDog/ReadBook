@@ -1,0 +1,201 @@
+正在启动 拆书工坊 Web 服务...
+INFO:     Will watch for changes in these directories: ['/Users/weilihua/WillsIdea/ChaiShu']
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     Started reloader process [22237] using StatReload
+INFO:     Started server process [22263]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22263]
+INFO:     Started server process [22341]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🎙️  开始转换: 第二章 格物.md
+🗣️  使用声音: zh-CN-YunxiNeural
+🗂️  音频路径: /Users/weilihua/WillsIdea/ChaiShu/audio/心学日课21天/第二章 格物_Audio.mp3
+📜  字幕路径: /Users/weilihua/WillsIdea/ChaiShu/subtitles/心学日课21天/第二章 格物_Subtitles.vtt
+INFO:     127.0.0.1:54923 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54923 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+
+✅ 转换成功！
+🎧 音频: /Users/weilihua/WillsIdea/ChaiShu/audio/心学日课21天/第二章 格物_Audio.mp3
+📝 字幕: /Users/weilihua/WillsIdea/ChaiShu/subtitles/心学日课21天/第二章 格物_Subtitles.vtt
+INFO:     127.0.0.1:54820 - "POST /api/generate_audio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54820 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55232 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55232 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55389 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55389 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57347 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57347 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22341]
+INFO:     Started server process [22576]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:58539 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59287 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59289 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59351 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59351 - "POST /api/generate_mindmap HTTP/1.1" 422 Unprocessable Entity
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22576]
+INFO:     Started server process [22776]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:59630 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59630 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59630 - "POST /api/generate_mindmap HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:59634 - "POST /api/generate_mindmap HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22776]
+INFO:     Started server process [22851]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:60255 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60255 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22851]
+INFO:     Started server process [22936]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:60532 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60532 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60532 - "POST /api/generate_mindmap HTTP/1.1" 500 Internal Server Error
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22936]
+INFO:     Started server process [22959]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:61476 - "POST /api/generate_mindmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63419 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63419 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64428 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64428 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64435 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64435 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64534 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64534 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65017 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65017 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65230 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65230 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65413 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65413 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49297 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49297 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49464 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49464 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49604 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49604 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49604 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49604 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49604 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49833 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49833 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49983 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49983 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49983 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49983 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49983 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /chapter.html?book=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9&chapter=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+🎙️  开始转换: 版权信息.md
+🗣️  使用声音: zh-CN-YunxiNeural
+🗂️  音频路径: /Users/weilihua/WillsIdea/ChaiShu/audio/心学日课21天/版权信息_Audio.mp3
+📜  字幕路径: /Users/weilihua/WillsIdea/ChaiShu/subtitles/心学日课21天/版权信息_Subtitles.vtt
+INFO:     127.0.0.1:50036 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50036 - "GET /subtitles/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9/%E7%89%88%E6%9D%83%E4%BF%A1%E6%81%AF_Subtitles.vtt HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50036 - "GET /audio/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9/%E7%89%88%E6%9D%83%E4%BF%A1%E6%81%AF_Audio.mp3 HTTP/1.1" 416 Requested Range Not Satisfiable
+INFO:     127.0.0.1:50036 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+
+✅ 转换成功！
+🎧 音频: /Users/weilihua/WillsIdea/ChaiShu/audio/心学日课21天/版权信息_Audio.mp3
+📝 字幕: /Users/weilihua/WillsIdea/ChaiShu/subtitles/心学日课21天/版权信息_Subtitles.vtt
+INFO:     127.0.0.1:49987 - "POST /api/generate_audio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /subtitles/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9/%E7%89%88%E6%9D%83%E4%BF%A1%E6%81%AF_Subtitles.vtt HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49987 - "GET /audio/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9/%E7%89%88%E6%9D%83%E4%BF%A1%E6%81%AF_Audio.mp3 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:50055 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50055 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50055 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50055 - "POST /api/generate_mindmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50214 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50214 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50214 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50214 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22959]
+INFO:     Started server process [23703]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:50482 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50482 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50482 - "POST /api/ai_sort HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50486 - "POST /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3/order HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50486 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51330 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51330 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51334 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51334 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51334 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51334 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51672 - "GET /chapter.html?book=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3&chapter=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51672 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51672 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51672 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51678 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51689 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51837 - "POST /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3/order HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51837 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51869 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51869 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52042 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52042 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52042 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52042 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52156 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52156 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52156 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52158 - "POST /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3/order HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52158 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52310 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52310 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52311 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
