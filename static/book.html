@@ -11,7 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <script id="tailwind-config">
@@ -60,27 +59,14 @@
             }
         }
 
-        .sortable-ghost {
-            opacity: 0.3;
-            background: rgba(255, 87, 34, 0.1) !important;
-            border: 2px dashed #ff5722 !important;
-        }
-
-        .sortable-drag {
-            cursor: grabbing !important;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
-        }
-
-        .drag-handle {
-            cursor: grab;
-        }
-
         .sorting-mode .chapter-item {
-            cursor: grab;
+            cursor: pointer;
         }
 
-        .sorting-mode .chapter-item:active {
-            cursor: grabbing;
+        .chapter-item.selected {
+            border-color: #ff5722 !important;
+            background: rgba(255, 87, 34, 0.1) !important;
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.2);
         }
 
         ::-webkit-scrollbar {
@@ -287,9 +273,9 @@
             <div class="p-6 space-y-5">
                 <div class="space-y-2">
                     <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">API 密钥 (API Key)</label>
-                    <input type="password" id="api-key-input"
+                    <input type="text" id="api-key-input"
                         class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all font-mono text-sm"
-                        placeholder="sk-...">
+                        placeholder="sk-..." onfocus="handleKeyFocus()" onblur="handleKeyBlur()">
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">接口地址 (Base URL)</label>
@@ -302,9 +288,8 @@
                         <label class="text-sm font-bold text-slate-400 uppercase tracking-widest">AI 模型</label>
                         <select id="model-select" onchange="checkCustomModel()"
                             class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all appearance-none text-sm">
-                            <option value="gpt-4o-mini" class="bg-background-dark">gpt-4o-mini (默认)</option>
-                            <option value="gpt-4o" class="bg-background-dark">gpt-4o (精推)</option>
-                            <option value="deepseek-chat" class="bg-background-dark">deepseek-chat</option>
+                            <option value="gpt-5.3-codex" class="bg-background-dark">gpt-5.3-codex (默认)</option>
+                            <option value="gpt-5.2-codex" class="bg-background-dark">gpt-5.2-codex</option>
                             <option value="custom" class="bg-background-dark">自定义输入...</option>
                         </select>
                         <input type="text" id="custom-model-input"
@@ -319,15 +304,23 @@
                     </div>
                 </div>
                 <p class="text-xs text-slate-500">配置保存在浏览器本地，我们不会在服务器端存储您的 API 密钥。</p>
+                <div id="test-result" class="mt-4 text-xs hidden p-3 rounded-xl bg-white/5 border border-white/10">
+                </div>
                 <div class="pt-2 flex gap-3">
-                    <button onclick="closeSettings()"
-                        class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-bold transition-all border border-white/10">
-                        取消
+                    <button id="test-btn" onclick="testConnection()"
+                        class="px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-bold transition-all border border-white/10 flex items-center gap-2">
+                        测试连接
                     </button>
-                    <button onclick="saveSettings()"
-                        class="flex-1 px-4 py-3 bg-primary hover:opacity-90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20">
-                        保存配置
-                    </button>
+                    <div class="flex-1 flex gap-3">
+                        <button onclick="closeSettings()"
+                            class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-bold transition-all border border-white/10">
+                            取消
+                        </button>
+                        <button onclick="saveSettings()"
+                            class="flex-1 px-4 py-3 bg-primary hover:opacity-90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20">
+                            保存配置
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -338,7 +331,7 @@
         let currentBookDetails = null;
         let isSortingMode = false;
         let currentTab = 'chapters';
-        let sortableInstance = null;
+        let selectedSortIndex = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
@@ -418,11 +411,18 @@
             chapters.forEach((chapter, index) => {
                 const div = document.createElement('div');
                 div.id = `chapter-item-${index}`;
-                div.className = `chapter-item group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 ${isSortingMode ? 'border-primary/30 bg-primary/5' : 'border-white/5 bg-white/3 hover:bg-white/5 hover:border-white/20'}`;
+                const isSelected = isSortingMode && selectedSortIndex === index;
+                div.className = `chapter-item group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 
+                    ${isSortingMode ? (isSelected ? 'selected' : 'border-white/10 bg-white/3 hover:border-primary/40') : 'border-white/5 bg-white/3 hover:bg-white/5 hover:border-white/20'}`;
                 div.setAttribute('data-title', chapter.title);
 
                 div.onclick = () => {
-                    if (!isSortingMode) goToChapter(index);
+                    if (isSortingMode) {
+                        selectedSortIndex = (selectedSortIndex === index) ? null : index;
+                        renderResult(currentBookDetails);
+                    } else {
+                        goToChapter(index);
+                    }
                 };
 
                 const hasAudio = chapter.has_audio;
@@ -434,7 +434,7 @@
                     if (hasAudio) {
                         actionsHTML += `
                             <button onclick="event.stopPropagation(); goToChapter(${index})" class="px-4 py-2 rounded-lg bg-primary text-white text-xs font-bold hover:brightness-110 transition-all">
-                                收听
+                                收听音频
                             </button>`;
                     } else {
                         actionsHTML += `
@@ -443,20 +443,30 @@
                             </button>`;
                     }
                     actionsHTML += `
-                        <button onclick="event.stopPropagation(); goToChapter(${index})" class="px-4 py-2 rounded-lg bg-white/5 text-slate-300 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
-                            生成播客
+                        <button onclick="generateSinglePodcast(event, this, ${hasPodcast})" data-chapter="${chapter.title}" class="px-4 py-2 rounded-lg bg-white/5 text-slate-300 text-xs font-bold hover:bg-white/10 transition-all border border-white/10">
+                            ${hasPodcast ? '重建播客' : '生成播客'}
                         </button>`;
+                } else if (isSelected) {
+                    // Sorting controls for selected item
+                    actionsHTML = `
+                        <div class="flex items-center gap-2">
+                            <button onclick="event.stopPropagation(); moveChapter(${index}, -1)" ${index === 0 ? 'disabled' : ''} 
+                                class="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center hover:bg-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                                <span class="material-symbols-outlined">expand_less</span>
+                            </button>
+                            <button onclick="event.stopPropagation(); moveChapter(${index}, 1)" ${index === chapters.length - 1 ? 'disabled' : ''} 
+                                class="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center hover:bg-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </button>
+                        </div>
+                    `;
                 }
 
                 div.innerHTML = `
                     <div class="flex items-center gap-5">
-                        ${isSortingMode ? `
-                            <span class="material-symbols-outlined text-primary/50 drag-handle">drag_indicator</span>
-                        ` : `
-                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 font-bold text-sm">
-                                ${index + 1}
-                            </div>
-                        `}
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center ${isSelected ? 'text-primary' : 'text-slate-500'} font-bold text-sm">
+                            ${index + 1}
+                        </div>
                         <div class="flex flex-col">
                             <h4 class="text-white font-bold tracking-tight group-hover:text-primary transition-colors">${chapter.title}</h4>
                             <div class="flex items-center gap-3 mt-1.5">
@@ -630,6 +640,7 @@
 
         function setSortMode(active) {
             isSortingMode = active;
+            selectedSortIndex = null;
             const btnSort = document.getElementById('btn-toggle-sort');
             const btnSave = document.getElementById('btn-save-sort');
             const btnCancel = document.getElementById('btn-cancel-sort');
@@ -642,28 +653,29 @@
                 btnSave.classList.remove('hidden');
                 btnCancel.classList.remove('hidden');
                 btnAi.classList.add('hidden');
-
-                // Initialize Sortable
-                sortableInstance = new Sortable(listEl, {
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    dragClass: 'sortable-drag',
-                    handle: '.drag-handle',
-                    delay: 100,
-                    delayOnTouchOnly: true
-                });
             } else {
                 btnSort.innerHTML = `<span class="material-symbols-outlined text-[18px]">sort</span><span>手动排序</span>`;
                 btnSort.classList.replace('text-primary', 'text-slate-400');
                 btnSave.classList.add('hidden');
                 btnCancel.classList.add('hidden');
                 btnAi.classList.remove('hidden');
-
-                if (sortableInstance) {
-                    sortableInstance.destroy();
-                    sortableInstance = null;
-                }
             }
+
+            renderResult(currentBookDetails);
+        }
+
+        function moveChapter(index, direction) {
+            const chapters = currentBookDetails.chapters;
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= chapters.length) return;
+
+            // Swap
+            const temp = chapters[index];
+            chapters[index] = chapters[newIndex];
+            chapters[newIndex] = temp;
+
+            // Update selection to follow the item
+            selectedSortIndex = newIndex;
 
             renderResult(currentBookDetails);
         }
@@ -722,9 +734,7 @@
         }
 
         async function saveNewOrder() {
-            const listEl = document.getElementById('chapter-list');
-            const items = listEl.querySelectorAll('.chapter-item');
-            const newOrder = Array.from(items).map(item => item.getAttribute('data-title'));
+            const newOrder = currentBookDetails.chapters.map(c => c.title);
 
             try {
                 const res = await fetch(`/api/books/${encodeURIComponent(currentBookName)}/order`, {
@@ -788,6 +798,43 @@
             }
         }
 
+        async function generateSinglePodcast(event, btnElement, forceRecreate = false) {
+            event.stopPropagation();
+            const chapterTitle = btnElement.getAttribute('data-chapter');
+
+            const originalHTML = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin-slow">autorenew</span>`;
+
+            try {
+                const response = await fetch('/api/generate_podcast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        book_name: currentBookName,
+                        chapter_title: chapterTitle,
+                        api_key: localStorage.getItem('openai_api_key'),
+                        api_base_url: localStorage.getItem('openai_api_base_url'),
+                        model_name: localStorage.getItem('openai_model'),
+                        force_recreate: forceRecreate
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    btnElement.innerHTML = `已完成`;
+                    btnElement.className = "px-4 py-2 rounded-lg bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30 cursor-default";
+                    setTimeout(() => loadBookDetails(currentBookName), 1000);
+                } else {
+                    throw new Error(data.error || data.detail);
+                }
+            } catch (error) {
+                alert("生成播客失败: " + error.message);
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalHTML;
+            }
+        }
+
         function checkCustomModel() {
             const select = document.getElementById('model-select');
             const customInput = document.getElementById('custom-model-input');
@@ -798,14 +845,48 @@
             }
         }
 
+        function maskKey(key) {
+            if (!key) return '';
+            if (key.length <= 12) return '••••••••' + key.slice(-4);
+            return key.slice(0, 7) + '••••••••' + key.slice(-4);
+        }
+
+        function handleKeyFocus() {
+            const input = document.getElementById('api-key-input');
+            if (input.value.includes('••••')) {
+                input.value = '';
+                input.type = 'password';
+            }
+        }
+
+        function handleKeyBlur() {
+            const input = document.getElementById('api-key-input');
+            if (input.value === '') {
+                const storedKey = localStorage.getItem('openai_api_key');
+                if (storedKey) {
+                    input.value = maskKey(storedKey);
+                    input.type = 'text';
+                }
+            }
+        }
+
         function openSettings() {
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
+            const resultDiv = document.getElementById('test-result');
+            if (resultDiv) resultDiv.classList.add('hidden');
 
-            document.getElementById('api-key-input').value = localStorage.getItem('openai_api_key') || '';
+            const storedKey = localStorage.getItem('openai_api_key');
+            if (storedKey) {
+                document.getElementById('api-key-input').value = maskKey(storedKey);
+                document.getElementById('api-key-input').type = 'text';
+            } else {
+                document.getElementById('api-key-input').value = '';
+            }
+
             document.getElementById('api-base-input').value = localStorage.getItem('openai_api_base_url') || '';
 
-            let storedModel = localStorage.getItem('openai_model') || 'gpt-4o-mini';
+            let storedModel = localStorage.getItem('openai_model') || 'gpt-5.3-codex';
             const select = document.getElementById('model-select');
 
             let found = false;
@@ -839,8 +920,62 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
+        async function testConnection() {
+            const apiKeyInput = document.getElementById('api-key-input');
+            const apiBaseInput = document.getElementById('api-base-input');
+            const modelSelect = document.getElementById('model-select');
+            const customModelInput = document.getElementById('custom-model-input');
+            const testBtn = document.getElementById('test-btn');
+            const resultDiv = document.getElementById('test-result');
+
+            let apiKey = apiKeyInput.value.trim();
+            if (apiKey.includes('••••')) {
+                apiKey = localStorage.getItem('openai_api_key');
+            }
+            if (!apiKey) {
+                alert('请先输入 API Key');
+                return;
+            }
+
+            const apiBase = apiBaseInput.value.trim();
+            let model = modelSelect.value;
+            if (model === 'custom') model = customModelInput.value.trim();
+            if (!model) model = 'gpt-5.3-codex';
+
+            const originalText = testBtn.innerText;
+            testBtn.disabled = true;
+            testBtn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span><span>测试中...</span>`;
+            resultDiv.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/test_connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key: apiKey, api_base_url: apiBase, model_name: model })
+                });
+                const data = await res.json();
+
+                resultDiv.classList.remove('hidden');
+                if (data.success) {
+                    resultDiv.className = 'mt-4 text-xs p-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400';
+                    resultDiv.innerText = '✅ 连接成功！模型响应正常。';
+                } else {
+                    resultDiv.className = 'mt-4 text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400';
+                    resultDiv.innerText = '❌ 连接失败：' + data.error;
+                }
+            } catch (err) {
+                resultDiv.classList.remove('hidden');
+                resultDiv.className = 'mt-4 text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400';
+                resultDiv.innerText = '❌ 网络错误：' + err.message;
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerText = originalText;
+            }
+        }
+
         function saveSettings() {
-            const apiKey = document.getElementById('api-key-input').value.trim();
+            const apiKeyInput = document.getElementById('api-key-input');
+            const apiKey = apiKeyInput.value.trim();
             const apiBase = document.getElementById('api-base-input').value.trim();
 
             const select = document.getElementById('model-select');
@@ -848,9 +983,11 @@
             if (model === 'custom') {
                 model = document.getElementById('custom-model-input').value.trim();
             }
-            if (!model) model = 'gpt-4o-mini';
+            if (!model) model = 'gpt-5.3-codex';
 
-            if (apiKey) { localStorage.setItem('openai_api_key', apiKey); }
+            if (apiKey && !apiKey.includes('••••')) {
+                localStorage.setItem('openai_api_key', apiKey);
+            }
             if (apiBase) {
                 localStorage.setItem('openai_api_base_url', apiBase);
             } else {

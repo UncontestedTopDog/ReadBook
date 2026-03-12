@@ -499,6 +499,39 @@ async def ai_smart_sort(req: AudioRequest):
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 
+@app.post("/api/test_connection")
+async def test_connection(req: AudioRequest):
+    try:
+        api_key = req.api_key
+        api_base_url = req.api_base_url
+        model_name = req.model_name or "gpt-4o-mini"
+        
+        if not api_key:
+            return JSONResponse({"success": False, "error": "API Key is required"}, status_code=400)
+            
+        client_kwargs = {"api_key": api_key, "timeout": 10.0}
+        if api_base_url:
+            client_kwargs["base_url"] = api_base_url
+            
+        client = OpenAI(**client_kwargs)
+        
+        # Perform a minimal test call
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[{"role": "user", "content": "hi"}],
+            max_tokens=5
+        )
+        
+        return JSONResponse({"success": True, "message": "Connection successful!"})
+    except Exception as e:
+        error_msg = str(e)
+        # Simplify common error messages
+        if "401" in error_msg:
+            error_msg = "Invalid API Key (401)"
+        elif "404" in error_msg:
+            error_msg = f"Model '{model_name}' not found or invalid Base URL (404)"
+        return JSONResponse({"success": False, "error": error_msg}, status_code=200)
+
 @app.get("/")
 def read_root():
     from fastapi.responses import FileResponse

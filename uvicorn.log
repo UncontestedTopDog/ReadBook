@@ -199,3 +199,100 @@ INFO:     127.0.0.1:52158 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86
 INFO:     127.0.0.1:52310 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52310 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52311 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52503 - "GET /book.html?name=%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52503 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52505 - "POST /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3/order HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52505 - "GET /api/books/%E4%B8%89%E4%BD%93%E5%85%A8%E9%9B%86%20-%20%E5%88%98%E6%85%88%E6%AC%A3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52564 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52564 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52564 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52565 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52565 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52866 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53581 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53581 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53816 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53816 - "GET /api/books HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [23703]
+INFO:     Started server process [24395]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:54252 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54252 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54255 - "POST /api/test_connection HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:54295 - "POST /api/test_connection HTTP/1.1" 422 Unprocessable Entity
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [24395]
+INFO:     Started server process [24437]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [24437]
+INFO:     Started server process [24463]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:54452 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54452 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54452 - "POST /api/test_connection HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:54452 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54452 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54453 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54453 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54470 - "GET /chapter.html?book=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9&chapter=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54470 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54470 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54470 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54470 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54470 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54766 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54766 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+📡 正在联机 gpt-5.3-codex 进行 AI 重写： 版权信息...
+INFO:     127.0.0.1:54769 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /api/books HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+✅ 生成对白脚本成功: /Users/weilihua/WillsIdea/ChaiShu/script/心学日课21天/版权信息_Script.md
+Generating 001_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 002_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 003_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 004_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 005_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 006_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 007_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 008_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 009_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 010_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 011_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 012_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 013_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 014_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 015_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 016_漫步.mp3 with zh-CN-YunxiNeural...
+Generating 017_星辰.mp3 with zh-CN-XiaoxiaoNeural...
+Generating 018_漫步.mp3 with zh-CN-YunxiNeural...
+INFO:     127.0.0.1:54988 - "GET /book.html?name=%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54988 - "GET /api/books/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9 HTTP/1.1" 200 OK
+ffmpeg version 7.0 Copyright (c) 2000-2024 the FFmpeg developers
+  built with Apple clang version 15.0.0 (clang-1500.1.0.2.5)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/7.0_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags='-Wl,-ld_classic' --enable-ffplay --enable-gnutls --enable-gpl --enable-libaom --enable-libaribb24 --enable-libbluray --enable-libdav1d --enable-libharfbuzz --enable-libjxl --enable-libmp3lame --enable-libopus --enable-librav1e --enable-librist --enable-librubberband --enable-libsnappy --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvmaf --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-lzma --enable-libfontconfig --enable-libfreetype --enable-frei0r --enable-libass --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libspeex --enable-libsoxr --enable-libzmq --enable-libzimg --disable-libjack --disable-indev=jack --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      59.  8.100 / 59.  8.100
+  libavcodec     61.  3.100 / 61.  3.100
+  libavformat    61.  1.100 / 61.  1.100
+  libavdevice    61.  1.100 / 61.  1.100
+  libavfilter    10.  1.100 / 10.  1.100
+  libswscale      8.  1.100 /  8.  1.100
+  libswresample   5.  1.100 /  5.  1.100
+  libpostproc    58.  1.100 / 58.  1.100
