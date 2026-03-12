@@ -284,6 +284,41 @@
             color: #c084fc;
         }
 
+        /* ── Active bubble ── */
+        .bubble-active {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bubble-active .bubble-card {
+            background: rgba(236, 91, 19, 0.12) !important;
+            border-color: rgba(236, 91, 19, 0.6) !important;
+            box-shadow: 0 0 25px rgba(236, 91, 19, 0.25);
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .bubble-active .avatar-ring-left,
+        .bubble-active .avatar-ring-right,
+        .bubble-active .avatar-ring-alt {
+            border-color: #ec5b13 !important;
+            box-shadow: 0 0 15px rgba(236, 91, 19, 0.4);
+        }
+
+        /* ── Audio segment highlight ── */
+        .audio-segment {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+            margin-left: -1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .audio-segment-active {
+            background: rgba(236, 91, 19, 0.08);
+            border-left-color: #ec5b13;
+        }
+
         /* ── Scene tag ─────────────────────────── */
         .scene-tag {
             background: rgba(255, 255, 255, 0.05);
@@ -627,6 +662,8 @@
         let currentChapterIndex = null;
         let currentBookDetails = null;
         let currentPlayerMode = 'audio';
+        let subtitles = [];
+        let lastActiveIndex = -1;
         const speeds = [0.75, 1, 1.25, 1.5, 2];
         let speedIndex = 1;
         const audioEl = document.getElementById('main-audio-player');
@@ -745,6 +782,8 @@
 
             audioEl.pause();
             resetProgress();
+            lastActiveIndex = -1;
+            subtitles = [];
 
             if (mode === 'audio') {
                 // ── Background ─────────────────────────
@@ -781,6 +820,8 @@
 
                 // ── Audio ───────────────────────────────
                 if (chapter.has_audio) {
+                    const vttUrl = `/subtitles/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Subtitles.vtt`;
+                    loadSubtitles(vttUrl);
                     document.getElementById('no-audio-fallback').classList.add('hidden');
                     audioEl.src = `/audio/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Audio.mp3`;
                     audioEl.load();
@@ -824,6 +865,8 @@
 
                 // ── Audio ───────────────────────────────
                 if (chapter.has_podcast) {
+                    const vttUrl = `/podcast_subtitles/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.vtt`;
+                    loadSubtitles(vttUrl);
                     audioEl.src = `/podcast/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.mp3`;
                     audioEl.load();
                 } else {
@@ -831,6 +874,7 @@
                 }
             }
         }
+
 
         // ════════════════════════════════════════════════
         // Podcast Dialogue Renderer
@@ -857,7 +901,134 @@
             { side: 'left', avatarBg: 'linear-gradient(135deg,#7c3aed,#c084fc)', avatarRing: 'avatar-ring-alt', labelCls: 'speaker-label-alt', cardCls: 'bubble-left', borderColor: 'border-purple-400/30' },
         ];
 
+        async function loadSubtitles(url) {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("VTT not found");
+                const text = await res.text();
+                subtitles = parseVtt(text);
+                if (subtitles.length > 0) {
+                    if (currentPlayerMode === 'podcast') {
+                        renderPodcastFromVtt(subtitles);
+                    } else if (currentPlayerMode === 'audio') {
+                        renderAudioFromVtt(subtitles);
+                    }
+                }
+            } catch (err) {
+                console.warn("Unable to load VTT subtitles, using markdown fallback:", err);
+                subtitles = [];
+                lastActiveIndex = -1;
+                if (currentPlayerMode === 'audio') {
+                    const chapter = currentBookDetails.chapters[currentChapterIndex];
+                    document.getElementById('markdown-content').innerHTML = marked.parse(chapter.content || '内容正在加载中...');
+                }
+            }
+        }
+
+        function parseVtt(vttContent) {
+            const cues = [];
+            const lines = vttContent.split('\n');
+            let currentCue = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                // Use RegExp constructor and unicode escape for '>' to avoid lint issues with '-->' in HTML
+                const tsRegex = new RegExp("(\\d{2}:\\d{2}:\\d{2}[.,]\\d{3})\\s*--\\u003e\\s*(\\d{2}:\\d{2}:\\d{2}[.,]\\d{3})");
+                const tsMatch = line.match(tsRegex);
+                if (tsMatch) {
+                    currentCue = {
+                        start: parseVttTimestamp(tsMatch[1]),
+                        end: parseVttTimestamp(tsMatch[2]),
+                        text: ""
+                    };
+                } else if (currentCue && line && !line.match(/^\d+$/)) {
+                    currentCue.text += (currentCue.text ? " " : "") + line;
+                } else if (line === "" && currentCue) {
+                    if (currentCue.text) cues.push(currentCue);
+                    currentCue = null;
+                }
+            }
+            if (currentCue && currentCue.text) cues.push(currentCue);
+            return cues;
+        }
+
+        function parseVttTimestamp(ts) {
+            const parts = ts.replace(',', '.').split(':');
+            const secParts = parts[2].split('.');
+            return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(secParts[0]) + parseInt(secParts[1]) / 1000;
+        }
+
+        function renderAudioFromVtt(cues) {
+            const container = document.getElementById('markdown-content');
+            container.innerHTML = '';
+            
+            cues.forEach((cue, index) => {
+                const div = document.createElement('div');
+                div.className = 'audio-segment';
+                div.setAttribute('data-cue-index', index);
+                div.onclick = () => {
+                    audioEl.currentTime = cue.start;
+                    audioEl.play();
+                };
+                // Parse markdown for each cue, but remove paragraph tags added by marked if it's just a single line
+                let html = marked.parse(cue.text);
+                div.innerHTML = html;
+                container.appendChild(div);
+            });
+        }
+
+        function renderPodcastFromVtt(cues) {
+            const container = document.getElementById('dialogue-container');
+            container.innerHTML = '';
+            let speakerCount = 0;
+            const speakerMap = {};
+            let delay = 0;
+
+            cues.forEach((cue, index) => {
+                // Match [Speaker] text
+                const match = cue.text.match(/^\[([^\]]+)\]\s*(.*)/);
+                if (match) {
+                    const speaker = match[1].trim();
+                    const content = match[2].trim();
+                    
+                    if (!(speaker in speakerMap)) {
+                        speakerMap[speaker] = speakerCount % SPEAKER_PRESETS.length;
+                        speakerCount++;
+                    }
+                    const preset = SPEAKER_PRESETS[speakerMap[speaker]];
+                    const emoji = AVATAR_EMOJIS[speakerMap[speaker] % AVATAR_EMOJIS.length];
+                    const isRight = preset.side === 'right';
+
+                    const bubble = document.createElement('div');
+                    bubble.className = `flex gap-4 items-start ${isRight ? 'flex-row-reverse' : ''} ${preset.cardCls} dialogue-bubble group`;
+                    bubble.setAttribute('data-cue-index', index);
+                    bubble.style.animationDelay = (delay % 1000) + 'ms'; // Prevent massive delays
+                    
+                    bubble.innerHTML = `
+                        <div class="flex-shrink-0">
+                            <div class="size-12 rounded-2xl overflow-hidden ${preset.avatarRing} flex items-center justify-center text-xl select-none"
+                                 style="background:${preset.avatarBg};">${emoji}</div>
+                            <p class="text-[10px] text-center mt-1 ${preset.labelCls} font-bold">${escapeHtml(speaker)}</p>
+                        </div>
+                        <div class="flex-1 bubble-card p-5 cursor-pointer" onclick="audioEl.currentTime = ${cue.start}; audioEl.play();">
+                            <p class="text-slate-200 leading-relaxed text-lg">${escapeHtml(content)}</p>
+                        </div>`;
+                    container.appendChild(bubble);
+                    delay += 60;
+                } else {
+                    // Narration/Scene tag style if no speaker
+                    const tag = document.createElement('div');
+                    tag.className = 'flex justify-center py-3 dialogue-bubble';
+                    tag.setAttribute('data-cue-index', index);
+                    tag.innerHTML = `<span class="scene-tag px-4 py-1 rounded-full italic cursor-pointer" onclick="audioEl.currentTime = ${cue.start}">${escapeHtml(cue.text)}</span>`;
+                    container.appendChild(tag);
+                    delay += 40;
+                }
+            });
+        }
+
         function renderPodcastDialogue(text) {
+            // This is now a fallback if VTT fails
             const container = document.getElementById('dialogue-container');
             container.innerHTML = '';
 
@@ -994,10 +1165,37 @@
 
         function updateProgress() {
             if (!audioEl.duration) return;
-            const pct = (audioEl.currentTime / audioEl.duration) * 100;
+            const currentTime = audioEl.currentTime;
+            const pct = (currentTime / audioEl.duration) * 100;
             document.getElementById('progress-bar-fill').style.width = pct + '%';
             document.getElementById('progress-thumb').style.left = pct + '%';
-            document.getElementById('time-current').innerText = formatTime(audioEl.currentTime);
+            document.getElementById('time-current').innerText = formatTime(currentTime);
+
+            // ── Sync highlight for both modes ──
+            if (subtitles.length > 0) {
+                syncHighlight(currentTime);
+            }
+        }
+
+        function syncHighlight(time) {
+            // Binary search or findIndex for current cue
+            const index = subtitles.findIndex(cue => time >= cue.start && time < cue.end);
+            
+            if (index !== -1 && index !== lastActiveIndex) {
+                // Clear old
+                const activeClass = currentPlayerMode === 'podcast' ? 'bubble-active' : 'audio-segment-active';
+                const old = document.querySelector('.' + activeClass);
+                if (old) old.classList.remove(activeClass);
+                
+                // Set new
+                const current = document.querySelector(`[data-cue-index="${index}"]`);
+                if (current) {
+                    current.classList.add(activeClass);
+                    // Scroll into view
+                    current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                lastActiveIndex = index;
+            }
         }
 
         function resetProgress() {
