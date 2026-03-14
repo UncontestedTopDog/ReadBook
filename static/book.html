@@ -134,7 +134,7 @@
                 <p class="text-lg font-medium text-primary/80 animate-pulse">正在加载书籍信息...</p>
             </div>
 
-            <!-- Left Panel: Book Profile (hidden by default) -->
+            <!-- Left Panel: Book Profile  -->
             <aside id="book-profile-panel"
                 class="hidden w-full lg:w-[380px] flex flex-col gap-6 opacity-0 transition-opacity duration-500">
                 <div class="glass-panel rounded-3xl p-6 flex flex-col items-center text-center">
@@ -175,10 +175,32 @@
                     </button>
                 </div>
 
-
+                <!-- Storage Info Panel -->
+                <div class="glass-panel rounded-3xl p-6 flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">folder_open</span>
+                        结果存放位置
+                    </h3>
+                    <div class="bg-black/20 rounded-xl p-4 border border-white/5 group cursor-pointer hover:border-primary/30 transition-all"
+                        onclick="copyStoragePath()">
+                        <p id="storage-path"
+                            class="text-[10px] font-mono text-slate-500 break-all leading-relaxed line-clamp-3 mb-2"
+                            title="点击复制路径">
+                            读取中...
+                        </p>
+                        <div
+                            class="flex items-center gap-1.5 text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-all">
+                            <span class="material-symbols-outlined text-[12px]">content_copy</span>
+                            点击一键复制路径
+                        </div>
+                    </div>
+                    <div id="storage-folders" class="flex flex-wrap gap-2">
+                        <!-- Folders will be injected here -->
+                    </div>
+                </div>
             </aside>
 
-            <!-- Right Panel: Chapter List (hidden by default) -->
+            <!-- Right Panel: Chapter List -->
             <section id="content-panel"
                 class="hidden flex-1 glass-panel rounded-3xl overflow-hidden flex flex-col opacity-0 transition-opacity duration-500 lg:h-[calc(100vh-120px)]">
                 <div class="flex items-center justify-between px-8 py-4 border-b border-white/10 shrink-0">
@@ -194,7 +216,7 @@
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-3 mb-4">
+                    <div class="flex items-center gap-3">
                         <button id="btn-toggle-sort" onclick="toggleSortMode()"
                             class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400 text-xs font-bold hover:bg-white/10 transition-all">
                             <span class="material-symbols-outlined text-[18px]">sort</span>
@@ -327,6 +349,22 @@
     </div>
 
     <script>
+        function copyStoragePath() {
+            const path = document.getElementById('storage-path').innerText;
+            if (path && path !== '读取中...') {
+                navigator.clipboard.writeText(path).then(() => {
+                    const el = document.getElementById('storage-path');
+                    const oldText = el.innerText;
+                    el.innerText = '已复制到剪贴板！';
+                    el.classList.add('text-primary');
+                    setTimeout(() => {
+                        el.innerText = oldText;
+                        el.classList.remove('text-primary');
+                    }, 2000);
+                });
+            }
+        }
+
         let currentBookName = null;
         let currentBookDetails = null;
         let isSortingMode = false;
@@ -398,6 +436,32 @@
             document.getElementById('stat-audios').innerText = audioCount;
             document.getElementById('stat-podcasts').innerText = podcastCount;
 
+            // Update Storage Info
+            if (data.book_dir) {
+                document.getElementById('storage-path').innerText = data.book_dir;
+            }
+            const folderContainer = document.getElementById('storage-folders');
+            folderContainer.innerHTML = '';
+            if (data.active_folders) {
+                const colors = {
+                    'audio': 'text-blue-400 bg-blue-400/10',
+                    'podcast': 'text-purple-400 bg-purple-400/10',
+                    'mindmap': 'text-green-400 bg-green-400/10',
+                    'chapters': 'text-orange-400 bg-orange-400/10',
+                    'subtitles': 'text-cyan-400 bg-cyan-400/10',
+                    'podcast_subtitles': 'text-pink-400 bg-pink-400/10',
+                    'script': 'text-yellow-400 bg-yellow-400/10'
+                };
+                data.active_folders.sort().forEach(folder => {
+                    if (folder === 'original') return;
+                    const span = document.createElement('span');
+                    const colorClass = colors[folder] || 'text-slate-400 bg-white/5';
+                    span.className = `text-[10px] font-bold px-2 py-1 rounded-md border border-white/5 ${colorClass}`;
+                    span.innerText = folder;
+                    folderContainer.appendChild(span);
+                });
+            }
+
             // Populate Chapter List
             const listEl = document.getElementById('chapter-list');
             listEl.innerHTML = '';
@@ -412,8 +476,7 @@
                 const div = document.createElement('div');
                 div.id = `chapter-item-${index}`;
                 const isSelected = isSortingMode && selectedSortIndex === index;
-                div.className = `chapter-item group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 
-                    ${isSortingMode ? (isSelected ? 'selected' : 'border-white/10 bg-white/3 hover:border-primary/40') : 'border-white/5 bg-white/3 hover:bg-white/5 hover:border-white/20'}`;
+                div.className = `chapter-item group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 ${isSortingMode ? (isSelected ? 'selected' : 'border-white/10 bg-white/3 hover:border-primary/40') : 'border-white/5 bg-white/3 hover:bg-white/5 hover:border-white/20'}`;
                 div.setAttribute('data-title', chapter.title);
 
                 div.onclick = () => {
@@ -494,13 +557,11 @@
             const tabs = {
                 'chapters': {
                     btn: 'tab-chapters',
-                    panel: 'chapter-list',
-                    sortPanel: document.querySelector('.flex.items-center.gap-3.mb-4')
+                    panel: 'chapter-list'
                 },
                 'mindmap': {
                     btn: 'tab-mindmap',
-                    panel: 'mindmap-container',
-                    sortPanel: document.querySelector('.flex.items-center.gap-3.mb-4')
+                    panel: 'mindmap-container'
                 }
             };
 
@@ -699,7 +760,6 @@
                 });
                 const data = await res.json();
                 if (data.success && data.order) {
-                    // 自动调用保存接口
                     const saveRes = await fetch(`/api/books/${encodeURIComponent(currentBookName)}/order`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -712,7 +772,7 @@
 
                     if (saveData.success) {
                         alert("AI 智能排序并保存成功！");
-                        loadBookDetails(currentBookName); // 重新加载数据
+                        loadBookDetails(currentBookName);
                     } else {
                         alert("保存 AI 排序失败：" + saveData.error);
                     }
@@ -729,7 +789,6 @@
 
         function cancelSort() {
             setSortMode(false);
-            // 重新加载数据，以恢复原始排序（舍弃页面上未保存的拖拽变动）
             loadBookDetails(currentBookName);
         }
 
@@ -874,6 +933,7 @@
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
             const resultDiv = document.getElementById('test-result');
+
             if (resultDiv) resultDiv.classList.add('hidden');
 
             const storedKey = localStorage.getItem('openai_api_key');
@@ -886,12 +946,14 @@
 
             document.getElementById('api-base-input').value = localStorage.getItem('openai_api_base_url') || '';
 
-            let storedModel = localStorage.getItem('openai_model') || 'gpt-5.3-codex';
+            const storedModel = localStorage.getItem('openai_model') || 'gpt-5.3-codex';
             const select = document.getElementById('model-select');
-
             let found = false;
             for (let i = 0; i < select.options.length; i++) {
-                if (select.options[i].value === storedModel) { found = true; break; }
+                if (select.options[i].value === storedModel) {
+                    found = true;
+                    break;
+                }
             }
 
             const customInput = document.getElementById('custom-model-input');
@@ -917,7 +979,9 @@
 
             modal.classList.add('opacity-0');
             content.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
         async function testConnection() {

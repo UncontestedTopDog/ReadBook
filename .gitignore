@@ -24,15 +24,8 @@ Thumbs.db
 # Agent files
 .agent/
 
-# Project generated/downloaded data
-audio/
-chapters/
-original/
-podcast/
-podcast_subtitles/
-script/
-stitch_downloads/
-subtitles/
+# Project generated data (allowed now)
+# stitch_downloads/ 
 
 # Other Python stuff
 *.so

@@ -820,10 +820,10 @@
 
                 // ── Audio ───────────────────────────────
                 if (chapter.has_audio) {
-                    const vttUrl = `/subtitles/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Subtitles.vtt`;
+                    const vttUrl = `/${encodeURIComponent(bookName)}/subtitles/${encodeURIComponent(chapterTitle)}_Subtitles.vtt`;
                     loadSubtitles(vttUrl);
                     document.getElementById('no-audio-fallback').classList.add('hidden');
-                    audioEl.src = `/audio/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Audio.mp3`;
+                    audioEl.src = `/${encodeURIComponent(bookName)}/audio/${encodeURIComponent(chapterTitle)}_Audio.mp3`;
                     audioEl.load();
                 } else {
                     audioEl.src = '';
@@ -865,9 +865,9 @@
 
                 // ── Audio ───────────────────────────────
                 if (chapter.has_podcast) {
-                    const vttUrl = `/podcast_subtitles/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.vtt`;
+                    const vttUrl = `/${encodeURIComponent(bookName)}/podcast_subtitles/${encodeURIComponent(chapterTitle)}_Script_Podcast.vtt`;
                     loadSubtitles(vttUrl);
-                    audioEl.src = `/podcast/${encodeURIComponent(bookName)}/${encodeURIComponent(chapterTitle)}_Script_Podcast.mp3`;
+                    audioEl.src = `/${encodeURIComponent(bookName)}/podcast/${encodeURIComponent(chapterTitle)}_Script_Podcast.mp3`;
                     audioEl.load();
                 } else {
                     audioEl.src = '';
@@ -961,7 +961,7 @@
         function renderAudioFromVtt(cues) {
             const container = document.getElementById('markdown-content');
             container.innerHTML = '';
-            
+
             cues.forEach((cue, index) => {
                 const div = document.createElement('div');
                 div.className = 'audio-segment';
@@ -990,7 +990,7 @@
                 if (match) {
                     const speaker = match[1].trim();
                     const content = match[2].trim();
-                    
+
                     if (!(speaker in speakerMap)) {
                         speakerMap[speaker] = speakerCount % SPEAKER_PRESETS.length;
                         speakerCount++;
@@ -1003,7 +1003,7 @@
                     bubble.className = `flex gap-4 items-start ${isRight ? 'flex-row-reverse' : ''} ${preset.cardCls} dialogue-bubble group`;
                     bubble.setAttribute('data-cue-index', index);
                     bubble.style.animationDelay = (delay % 1000) + 'ms'; // Prevent massive delays
-                    
+
                     bubble.innerHTML = `
                         <div class="flex-shrink-0">
                             <div class="size-12 rounded-2xl overflow-hidden ${preset.avatarRing} flex items-center justify-center text-xl select-none"
@@ -1180,13 +1180,13 @@
         function syncHighlight(time) {
             // Binary search or findIndex for current cue
             const index = subtitles.findIndex(cue => time >= cue.start && time < cue.end);
-            
+
             if (index !== -1 && index !== lastActiveIndex) {
                 // Clear old
                 const activeClass = currentPlayerMode === 'podcast' ? 'bubble-active' : 'audio-segment-active';
                 const old = document.querySelector('.' + activeClass);
                 if (old) old.classList.remove(activeClass);
-                
+
                 // Set new
                 const current = document.querySelector(`[data-cue-index="${index}"]`);
                 if (current) {

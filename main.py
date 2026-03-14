@@ -39,33 +39,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Helper to get book-specific paths
+def get_book_dir(book_name, subfolder=None):
+    book_dir = os.path.join(script_dir, book_name)
+    if subfolder:
+        return os.path.join(book_dir, subfolder)
+    return book_dir
+
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-os.makedirs("audio", exist_ok=True)
-app.mount("/audio", StaticFiles(directory="audio"), name="audio")
-
-os.makedirs("podcast", exist_ok=True)
-app.mount("/podcast", StaticFiles(directory="podcast"), name="podcast")
-
-os.makedirs("subtitles", exist_ok=True)
-app.mount("/subtitles", StaticFiles(directory="subtitles"), name="subtitles")
-
-os.makedirs("podcast_subtitles", exist_ok=True)
-app.mount("/podcast_subtitles", StaticFiles(directory="podcast_subtitles"), name="podcast_subtitles")
-
-os.makedirs("mindmap", exist_ok=True)
-app.mount("/mindmap", StaticFiles(directory="mindmap"), name="mindmap")
 
 def read_book_details(book_name):
-    base_chapters_dir = os.path.join(script_dir, "chapters")
-    book_dir = os.path.join(base_chapters_dir, book_name)
+    book_chapters_dir = get_book_dir(book_name, "chapters")
     
-    if not os.path.exists(book_dir):
+    if not os.path.exists(book_chapters_dir):
         return None
         
     # Load custom order if exists
-    order_path = os.path.join(book_dir, "order.json")
+    order_path = os.path.join(book_chapters_dir, "order.json")
     custom_order = []
     if os.path.exists(order_path):
         try:
@@ -75,30 +67,26 @@ def read_book_details(book_name):
             pass
 
     raw_chapters = {}
-    cover_base64 = None
+    cover_url = None
     
-    for filename in os.listdir(book_dir):
-        filepath = os.path.join(book_dir, filename)
+    for filename in os.listdir(book_chapters_dir):
+        filepath = os.path.join(book_chapters_dir, filename)
         if filename.startswith("cover."):
-            with open(filepath, "rb") as f:
-                ext = os.path.splitext(filename)[1].lower()
-                mime_type = f"image/{ext[1:]}" if ext in [".png", ".jpg", ".jpeg", ".webp"] else "image/jpeg"
-                encoded = base64.b64encode(f.read()).decode('utf-8')
-                cover_base64 = f"data:{mime_type};base64,{encoded}"
+            cover_url = f"/{book_name}/chapters/{filename}"
         elif filename.endswith(".md"):
             chapter_title = filename.replace(".md", "")
             
             # 检查音频是否已生成
-            audio_path = os.path.join(script_dir, "audio", book_name, f"{chapter_title}_Audio.mp3")
+            audio_path = os.path.join(get_book_dir(book_name, "audio"), f"{chapter_title}_Audio.mp3")
             has_audio = os.path.exists(audio_path)
             
             # 检查播客是否已生成
-            podcast_path = os.path.join(script_dir, "podcast", book_name, f"{chapter_title}_Script_Podcast.mp3")
+            podcast_path = os.path.join(get_book_dir(book_name, "podcast"), f"{chapter_title}_Script_Podcast.mp3")
             has_podcast = os.path.exists(podcast_path)
             
             podcast_script_content = None
             if has_podcast:
-                script_path = os.path.join(script_dir, "script", book_name, f"{chapter_title}_Script.md")
+                script_path = os.path.join(get_book_dir(book_name, "script"), f"{chapter_title}_Script.md")
                 if os.path.exists(script_path):
                     with open(script_path, "r", encoding="utf-8") as sf:
                         podcast_script_content = sf.read()
@@ -126,15 +114,9 @@ def read_book_details(book_name):
         chapters.append(raw_chapters[title])
                 
     # 检查思维导图是否已生成
-    mindmap_dir = os.path.join(script_dir, "mindmap", book_name)
+    mindmap_dir = get_book_dir(book_name, "mindmap")
     mindmap_path = os.path.join(mindmap_dir, f"{book_name}_MindMap.md")
     
-    # 兼容旧路径检查 (如果旧路径存在且新路径不存在，则自动迁移)
-    old_mindmap_path = os.path.join(book_dir, "mindmap.md")
-    if os.path.exists(old_mindmap_path) and not os.path.exists(mindmap_path):
-        os.makedirs(mindmap_dir, exist_ok=True)
-        shutil.move(old_mindmap_path, mindmap_path)
-
     has_mindmap = os.path.exists(mindmap_path)
     mindmap_content = None
     if has_mindmap:
@@ -143,32 +125,34 @@ def read_book_details(book_name):
 
     return {
         "book_name": book_name,
-        "cover": cover_base64,
+        "book_dir": get_book_dir(book_name),
+        "cover": cover_url,
         "chapters": chapters,
         "has_mindmap": has_mindmap,
-        "mindmap": mindmap_content
+        "mindmap": mindmap_content,
+        "active_folders": [f for f in os.listdir(get_book_dir(book_name)) if os.path.isdir(os.path.join(get_book_dir(book_name), f))]
     }
 
 @app.post("/api/upload")
 def upload_epub(file: UploadFile = File(...)):
     try:
         book_name = os.path.splitext(file.filename)[0]
+        book_dir = get_book_dir(book_name)
         
-        # 保存原始 EPUB 文件到本地 original 目录
-        original_dir = os.path.join(script_dir, "original")
+        # 保存原始 EPUB 文件到 [book_name]/original 目录
+        original_dir = os.path.join(book_dir, "original")
         os.makedirs(original_dir, exist_ok=True)
         epub_path = os.path.join(original_dir, file.filename)
         
         with open(epub_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
-        # 提取 EPUB 到本地 chapters 目录
-        base_chapters_dir = os.path.join(script_dir, "chapters")
-        output_dir = os.path.join(base_chapters_dir, book_name)
-        os.makedirs(output_dir, exist_ok=True)
+        # 提取 EPUB 到 [book_name]/chapters 目录
+        chapters_dir = os.path.join(book_dir, "chapters")
+        os.makedirs(chapters_dir, exist_ok=True)
         
         # 调用技能提取
-        extract_chapters(epub_path, output_dir)
+        extract_chapters(epub_path, chapters_dir)
         
         # 读取返回提取的内容
         details = read_book_details(book_name)
@@ -182,34 +166,35 @@ def upload_epub(file: UploadFile = File(...)):
 
 @app.get("/api/books")
 async def get_books():
-    base_chapters_dir = os.path.join(script_dir, "chapters")
-    if not os.path.exists(base_chapters_dir):
-        return JSONResponse({"books": []})
-    
     books = []
-    # 跳过隐藏文件夹等
-    for book_name in sorted(os.listdir(base_chapters_dir)):
-        if book_name.startswith('.'):
+    # 排除系统级和功能级目录
+    EXCLUDED_DIRS = {
+        'static', 'original', 'chapters', 'audio', 'podcast', 'subtitles', 
+        'podcast_subtitles', 'mindmap', 'script', 'stitch_downloads', 
+        'venv', '.venv', '__pycache__', '.git', '.agent', '.DS_Store'
+    }
+    
+    # 遍历当前目录，找包含 chapters 的文件夹
+    for name in sorted(os.listdir(script_dir)):
+        if name in EXCLUDED_DIRS or name.startswith('.'):
             continue
-        book_dir = os.path.join(base_chapters_dir, book_name)
+            
+        book_dir = os.path.join(script_dir, name)
         if os.path.isdir(book_dir):
-            cover_base64 = None
-            chapter_count = 0
-            for filename in os.listdir(book_dir):
-                if filename.startswith("cover."):
-                    filepath = os.path.join(book_dir, filename)
-                    with open(filepath, "rb") as f:
-                        ext = os.path.splitext(filename)[1].lower()
-                        mime_type = f"image/{ext[1:]}" if ext in [".png", ".jpg", ".jpeg", ".webp"] else "image/jpeg"
-                        encoded = base64.b64encode(f.read()).decode('utf-8')
-                        cover_base64 = f"data:{mime_type};base64,{encoded}"
-                elif filename.endswith(".md"):
-                    chapter_count += 1
-            books.append({
-                "name": book_name,
-                "cover": cover_base64,
-                "chapter_count": chapter_count
-            })
+            chapters_dir = os.path.join(book_dir, "chapters")
+            if os.path.isdir(chapters_dir):
+                cover_url = None
+                chapter_count = 0
+                for filename in os.listdir(chapters_dir):
+                    if filename.startswith("cover."):
+                        cover_url = f"/{name}/chapters/{filename}"
+                    elif filename.endswith(".md"):
+                        chapter_count += 1
+                books.append({
+                    "name": name,
+                    "cover": cover_url,
+                    "chapter_count": chapter_count
+                })
     return JSONResponse({"books": books})
 
 @app.get("/api/books/{book_name}")
@@ -227,12 +212,11 @@ class OrderRequest(BaseModel):
 @app.post("/api/books/{book_name}/order")
 async def save_book_order(book_name: str, req: OrderRequest):
     try:
-        base_chapters_dir = os.path.join(script_dir, "chapters")
-        book_dir = os.path.join(base_chapters_dir, book_name)
-        if not os.path.exists(book_dir):
+        chapters_dir = get_book_dir(book_name, "chapters")
+        if not os.path.exists(chapters_dir):
             return JSONResponse({"success": False, "error": "Book not found"}, status_code=404)
         
-        order_path = os.path.join(book_dir, "order.json")
+        order_path = os.path.join(chapters_dir, "order.json")
         with open(order_path, "w", encoding="utf-8") as f:
             json.dump(req.order, f, ensure_ascii=False, indent=2)
             
@@ -251,15 +235,17 @@ class AudioRequest(BaseModel):
 @app.post("/api/generate_audio")
 def generate_chapter_audio(req: AudioRequest):
     try:
-        base_chapters_dir = os.path.join(script_dir, "chapters")
-        book_dir = os.path.join(base_chapters_dir, req.book_name)
-        md_file_path = os.path.join(book_dir, f"{req.chapter_title}.md")
+        chapters_dir = get_book_dir(req.book_name, "chapters")
+        md_file_path = os.path.join(chapters_dir, f"{req.chapter_title}.md")
         
         if not os.path.exists(md_file_path):
             return JSONResponse({"success": False, "error": "Markdown file not found"}, status_code=404)
         
+        out_audio_dir = get_book_dir(req.book_name, "audio")
+        out_sub_dir = get_book_dir(req.book_name, "subtitles")
+        
         # 调用技能进行音频转换和VTT提取
-        convert_md_to_audio(md_file_path, subtitles=True)
+        convert_md_to_audio(md_file_path, output_dir=out_audio_dir, subtitles=True, subtitles_dir=out_sub_dir)
         return JSONResponse({"success": True, "message": "音频及字幕生成成功"})
         
     except Exception as e:
@@ -268,9 +254,8 @@ def generate_chapter_audio(req: AudioRequest):
 @app.post("/api/generate_mindmap")
 def generate_book_mindmap(req: AudioRequest):
     try:
-        base_chapters_dir = os.path.join(script_dir, "chapters")
-        book_dir = os.path.join(base_chapters_dir, req.book_name)
-        mindmap_dir = os.path.join(script_dir, "mindmap", req.book_name)
+        chapters_dir = get_book_dir(req.book_name, "chapters")
+        mindmap_dir = get_book_dir(req.book_name, "mindmap")
         os.makedirs(mindmap_dir, exist_ok=True)
         mindmap_path = os.path.join(mindmap_dir, f"{req.book_name}_MindMap.md")
         
@@ -286,9 +271,9 @@ def generate_book_mindmap(req: AudioRequest):
             
         # 读取所有章节标题和前几行作为摘要
         context_parts = []
-        for filename in sorted(os.listdir(book_dir)):
+        for filename in sorted(os.listdir(chapters_dir)):
             if filename.endswith(".md") and filename != "mindmap.md":
-                with open(os.path.join(book_dir, filename), "r", encoding="utf-8") as f:
+                with open(os.path.join(chapters_dir, filename), "r", encoding="utf-8") as f:
                     content = f.read()
                     context_parts.append(f"章节: {filename.replace('.md', '')}\n内容摘要: {content[:500]}...")
         
@@ -331,9 +316,7 @@ def generate_book_mindmap(req: AudioRequest):
 @app.post("/api/generate_podcast")
 def generate_chapter_podcast(req: AudioRequest):
     try:
-        base_chapters_dir = os.path.join(script_dir, "chapters")
-        base_script_dir = os.path.join(script_dir, "script")
-        book_script_dir = os.path.join(base_script_dir, req.book_name)
+        book_script_dir = get_book_dir(req.book_name, "script")
         os.makedirs(book_script_dir, exist_ok=True)
         md_script_path = os.path.join(book_script_dir, f"{req.chapter_title}_Script.md")
         
@@ -342,12 +325,12 @@ def generate_chapter_podcast(req: AudioRequest):
             os.remove(md_script_path)
         
         # Output directories
-        out_audio_dir = os.path.join(script_dir, "podcast")
-        out_sub_dir = os.path.join(script_dir, "podcast_subtitles")
+        out_audio_dir = get_book_dir(req.book_name, "podcast")
+        out_sub_dir = get_book_dir(req.book_name, "podcast_subtitles")
         
         if req.force_recreate:
             # 清理旧的音频和字幕文件
-            old_audio = os.path.join(out_audio_dir, req.book_name, f"{req.chapter_title}_Script_Podcast.mp3")
+            old_audio = os.path.join(out_audio_dir, f"{req.chapter_title}_Script_Podcast.mp3")
             if os.path.exists(old_audio):
                 os.remove(old_audio)
         
@@ -363,7 +346,7 @@ def generate_chapter_podcast(req: AudioRequest):
                 }, status_code=400)
             
             # 读取原始提取出来的 MD 章节文稿
-            md_file_path = os.path.join(base_chapters_dir, req.book_name, f"{req.chapter_title}.md")
+            md_file_path = os.path.join(get_book_dir(req.book_name, "chapters"), f"{req.chapter_title}.md")
             if not os.path.exists(md_file_path):
                 return JSONResponse({"success": False, "error": "源文稿缺失，无法提取大纲。"}, status_code=404)
                 
@@ -423,14 +406,13 @@ def generate_chapter_podcast(req: AudioRequest):
 @app.post("/api/ai_sort")
 async def ai_smart_sort(req: AudioRequest):
     try:
-        base_chapters_dir = os.path.join(script_dir, "chapters")
-        book_dir = os.path.join(base_chapters_dir, req.book_name)
-        if not os.path.exists(book_dir):
+        chapters_dir = get_book_dir(req.book_name, "chapters")
+        if not os.path.exists(chapters_dir):
             return JSONResponse({"success": False, "error": "Book not found"}, status_code=404)
         
         # 获取所有待排序的章节标题
         chapter_titles = []
-        for filename in os.listdir(book_dir):
+        for filename in os.listdir(chapters_dir):
             if filename.endswith(".md") and filename != "mindmap.md":
                 chapter_titles.append(filename.replace(".md", ""))
         
@@ -546,4 +528,20 @@ def read_book_html():
 def read_chapter_html():
     from fastapi.responses import FileResponse
     return FileResponse("static/chapter.html")
+
+# Dynamic route to serve book files (audio, podcast, etc.)
+# Access: /{book_name}/{folder}/{filename}
+# NOTE: This must be at the end to avoid intercepting other routes like /api/books/{name}
+@app.get("/{book_name}/{folder}/{filename}")
+async def serve_book_files(book_name: str, folder: str, filename: str):
+    # Security check: avoid serving sensitive files
+    # Static is allowed here for legacy support but we generally use /static mount
+    if folder in [".agent", ".git", ".venv", "__pycache__"] or filename.endswith(('.py', '.env', '.sh', '.log')):
+        return JSONResponse({"error": "Access denied"}, status_code=403)
+        
+    path = os.path.join(script_dir, book_name, folder, filename)
+    if os.path.exists(path) and os.path.isfile(path):
+        from fastapi.responses import FileResponse
+        return FileResponse(path)
+    return JSONResponse({"error": "File not found"}, status_code=404)
 

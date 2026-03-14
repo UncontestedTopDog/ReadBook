@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(34, 22, 16, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(236, 91, 19, 0.1);
+        }
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(236, 91, 19, 0.2);
+            border-color: rgba(236, 91, 19, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-slate-100 min-h-screen selection:bg-primary/30">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 glass-panel border-b border-primary/10 px-6 py-4">
+<div class="max-w-6xl mx-auto flex items-center justify-between">
+<a class="flex items-center gap-2 group" href="#">
+<div class="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-2xl">menu_book</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-100 group-hover:text-primary transition-colors">拆书工坊</h1>
+</a>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl border border-primary/20 transition-all font-medium">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>配置中心</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-orange-400 p-0.5">
+<img class="w-full h-full rounded-full object-cover border-2 border-background-dark" data-alt="User profile avatar smiling man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2fIrfD1vSWuPrrbe_fFpDkXf3G6DF5ok5zh5YP1j1eba_zT9ECB_M6CiKvm51e4YpctbD9qWETO6X1PHd49lGbiPLapNeyONu9LtDxznuFmA1TJLY3TWd5M5BbCO0WatihLoiAKI6GsiBIaGKFXrntSetxMg-nVzg1kXsP13BU7bqJ2f2puASkxWjxHjPWxI66cy_OwLINKYZfkYJmiIDfURVAtheHyg55SyPdSO095TVXz4nk7-0GjoPFN3GddjM0Y56k3N3NzD6"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-6xl mx-auto px-6 py-8">
+<!-- Book Info Header -->
+<section class="flex flex-col md:flex-row gap-8 mb-12 items-start">
+<div class="relative group shrink-0">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary to-orange-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative w-48 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="Classic book cover of The Great Gatsby" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcwhPDFYs0_oTGoR_1ClrFA9tWLNUHpVAZhE3QKmh2tJfID_uU2ak8jyaMqcYEbXNq8axeN-cgA_oI5MjXFzdkyknlkSFuh6saW4-AjKwsMeKwkesRtjRITY8DCiTokVnq2D1qQCYpBDD7uxorEmBq4JEn8l9DMywEx0y2qiVDmcs2hcFzoPR7ydvFSJOE-crpAC6TuYpuc_NYCVf_8a3jR8mn13PWqeQSKhtQ8ZY7ecWLbut3hTgCm8j0ZL3fpDn4UC7GUFZ6Tupq"/>
+</div>
+</div>
+<div class="flex-1 pt-2">
+<div class="flex items-center gap-3 mb-2">
+<span class="px-2 py-1 rounded bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider">已完成拆解</span>
+<span class="text-slate-500 text-sm">更新于 2 小时前</span>
+</div>
+<h2 class="text-4xl font-extrabold text-slate-100 mb-4 tracking-tight">了不起的盖茨比 <span class="text-slate-500 font-light">/ The Great Gatsby</span></h2>
+<p class="text-slate-400 text-lg mb-6 leading-relaxed max-w-2xl">
+                    F. Scott Fitzgerald 的传世经典。通过尼克的视角，展现了 20 世纪 20 年代美国“爵士时代”的繁华与幻灭，以及盖茨比对黛西那份执着而悲剧性的追求。
+                </p>
+<div class="flex flex-wrap gap-6">
+<div class="flex flex-col">
+<span class="text-slate-500 text-xs uppercase font-bold tracking-widest">章节总数</span>
+<span class="text-2xl font-bold text-slate-100">9 章节</span>
+</div>
+<div class="w-px h-10 bg-primary/10 self-center"></div>
+<div class="flex flex-col">
+<span class="text-slate-500 text-xs uppercase font-bold tracking-widest">已产出内容</span>
+<span class="text-2xl font-bold text-slate-100">12 份音频</span>
+</div>
+<div class="w-px h-10 bg-primary/10 self-center"></div>
+<div class="flex flex-col">
+<span class="text-slate-500 text-xs uppercase font-bold tracking-widest">预估时长</span>
+<span class="text-2xl font-bold text-slate-100">145 分钟</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Chapter List Management -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold text-slate-100 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span>
+                    章节管理
+                </h3>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm transition-colors border border-slate-700">
+                        批量操作
+                    </button>
+<button class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
+                        一键生成全部
+                    </button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Chapter Row 1 -->
+<div class="glass-panel glow-hover rounded-xl p-5 flex flex-col lg:flex-row lg:items-center gap-6 transition-all cursor-pointer">
+<div class="flex-1 flex gap-5">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+<span class="text-primary font-bold">01</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-slate-100 mb-1">第一章：初识盖茨比</h4>
+<p class="text-slate-400 text-sm line-clamp-1">介绍尼克搬到西卵居住，初次在邻家豪宅草坪上看到凝视对岸绿光的盖茨比。</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<!-- Action: Single Voice -->
+<div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                已生成音频
+                            </button>
+<button class="p-1.5 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">play_arrow</span>
+</button>
+</div>
+<!-- Action: Podcast -->
+<div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold shadow-sm">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+                                生成播客
+                            </button>
+</div>
+<button class="p-2 text-slate-500 hover:text-slate-300 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chapter Row 2 -->
+<div class="glass-panel glow-hover rounded-xl p-5 flex flex-col lg:flex-row lg:items-center gap-6 transition-all cursor-pointer border-primary/20">
+<div class="flex-1 flex gap-5">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+<span class="text-primary font-bold">02</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-slate-100 mb-1">第二章：灰烬谷与默特尔</h4>
+<p class="text-slate-400 text-sm line-clamp-1">汤姆带着尼克前往灰烬谷，见到了他的情妇默特尔，随后在公寓举行了一场混乱的聚会。</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span>
+                                音频生成中...
+                            </button>
+</div>
+<div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10 opacity-50">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-700 text-slate-400 text-xs font-bold cursor-not-allowed">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+                                等待前序
+                            </button>
+</div>
+<button class="p-2 text-slate-500 hover:text-slate-300 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chapter Row 3 -->
+<div class="glass-panel glow-hover rounded-xl p-5 flex flex-col lg:flex-row lg:items-center gap-6 transition-all cursor-pointer">
+<div class="flex-1 flex gap-5">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+<span class="text-primary font-bold">03</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-slate-100 mb-1">第三章：盖茨比的盛宴</h4>
+<p class="text-slate-400 text-sm line-clamp-1">尼克受邀参加盖茨比规模宏大的周六晚宴，终于正式结识了这位神秘的主人。</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                已生成音频
+                            </button>
+</div>
+<div class="flex items-center gap-2 bg-background-dark/50 rounded-lg p-1.5 border border-primary/10">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30">
+<span class="material-symbols-outlined text-[16px]">done_all</span>
+                                播客已就绪
+                            </button>
+<button class="flex items-center gap-1 px-2 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] uppercase font-black rounded border border-red-500/20 transition-colors">
+<span class="material-symbols-outlined text-[14px]">replay</span>
+                                重新生成
+                            </button>
+</div>
+<button class="p-2 text-slate-500 hover:text-slate-300 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chapter Row 4 -->
+<div class="glass-panel glow-hover rounded-xl p-5 flex flex-col lg:flex-row lg:items-center gap-6 transition-all cursor-pointer opacity-70 grayscale-[0.5]">
+<div class="flex-1 flex gap-5">
+<div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
+<span class="text-slate-500 font-bold">04</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-slate-300 mb-1">第四章：盖茨比的过往</h4>
+<p class="text-slate-500 text-sm line-clamp-1">盖茨比向尼克讲述自己的经历，两人在纽约与梅耶·沃尔夫山姆共进午餐。</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<button class="px-6 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary text-sm font-bold border border-primary/20 transition-all">
+                            待处理
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Overlay / Settings Modal (Mocked as visible for demonstration, usually hidden) -->
+<div class="fixed inset-0 z-[100] bg-background-dark/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+<div class="glass-panel w-full max-w-lg rounded-2xl shadow-2xl border border-primary/30 overflow-hidden">
+<div class="px-6 py-4 border-b border-primary/10 flex justify-between items-center bg-primary/5">
+<h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">settings</span>
+                    API 配置中心
+                </h3>
+<button class="text-slate-400 hover:text-white">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-6 space-y-6">
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400 uppercase tracking-widest">API 密钥 (API Key)</label>
+<input class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all" placeholder="sk-..." type="password"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400 uppercase tracking-widest">接口地址 (Base URL)</label>
+<input class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all" type="text" value="https://api.openai.com/v1"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400 uppercase tracking-widest">AI 模型</label>
+<select class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all">
+<option>gpt-4o-mini</option>
+<option>gpt-4o</option>
+<option>gpt-3.5-turbo</option>
+<option>自定义...</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400 uppercase tracking-widest">生成并发数</label>
+<input class="w-full bg-background-dark border border-primary/20 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all" type="number" value="3"/>
+</div>
+</div>
+<div class="pt-4 flex gap-3">
+<button class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition-all border border-slate-700">
+                        测试连接
+                    </button>
+<button class="flex-1 px-4 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20">
+                        保存配置
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

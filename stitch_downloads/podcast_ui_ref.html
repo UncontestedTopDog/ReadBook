@@ -1,0 +1,212 @@
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "primary-hover": "#ff4b2b",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#0f0c29",
+                        "glass-dark": "rgba(48, 43, 99, 0.4)",
+                        "accent-glow": "#ff416c",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(236, 91, 19, 0.3);
+        }
+    </style>
+</head>
+<body class="font-display text-slate-100 min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 glass-panel border-b border-white/10 px-4 py-3 md:px-10">
+<div class="max-w-6xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h1 class="text-white text-sm font-semibold opacity-70">了不起的盖茨比</h1>
+<h2 class="text-white text-lg font-bold leading-tight">第一章：尼克的初来乍到</h2>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-all">
+<span class="material-symbols-outlined text-[20px]">settings_input_component</span>
+                    模型设置
+                </button>
+<button class="flex items-center justify-center size-10 rounded-xl bg-primary text-white glow-orange hover:bg-primary-hover transition-all">
+<span class="material-symbols-outlined">tune</span>
+</button>
+<div class="size-10 rounded-full border-2 border-primary/50 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlH2co-vsLbjKSZuIZpT3fRFKmSaxrZf63gaunoRW4Lwis_UUo3BJFfpDbHCpurISfPCJyJefikNRb4VM5-gjr3d7qaGeqYfB4AV2psWEbEtsGDTHDaFwPv5jzP7CfPdEUWqWaSNUjMXei6RlQgTNvoMSRz05QZWfDNmhj8vp5B5e3U45pqS4_uxzw6XPLD3xydmGM09_RZSy4pe8enjspcXrla-_NawcfXzkU-1Ma4MfNarMptut95QeMpAb_GiPhCH_kX1ddMFGU"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-4 py-8 pb-32">
+<!-- Mode Switcher -->
+<div class="flex justify-center mb-10">
+<div class="inline-flex p-1.5 glass-panel rounded-2xl border border-white/10">
+<button class="flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-semibold transition-all hover:text-white text-slate-400">
+<span class="material-symbols-outlined text-[18px]">auto_stories</span>
+                    原文模式
+                </button>
+<button class="flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-semibold transition-all bg-primary text-white glow-orange">
+<span class="material-symbols-outlined text-[18px]">podcasts</span>
+                    播客模式
+                </button>
+</div>
+</div>
+<!-- Podcast Script Content Area -->
+<div class="space-y-8">
+<!-- Scene Description -->
+<div class="flex justify-center">
+<span class="px-4 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-slate-400 uppercase tracking-widest">
+                    场景：尼克的纽约公寓，午后
+                </span>
+</div>
+<!-- Dialogue Item: Host -->
+<div class="flex gap-4 items-start group">
+<div class="flex-shrink-0">
+<div class="size-12 rounded-2xl overflow-hidden border-2 border-primary/30 group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover" data-alt="Host female avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2Ox94a6vAq_SZ5pRZhwqurUEWpuSsJJ8-YF5H0gI1VmLxhItTnve4LrwYhD4aBFA7GrWvR0nw4mFDj3BZsHEenxVWl9-jljOD1w0cgtNJR-aCJNZbgKw6i7mNfYFHwguAP0sPA2LQkQFqfWTMQxvpTrZ87d2lF0zHkGh8WF3qosyOyxmsUCnPCOnHGZ0umEniNcpQ6eKyxLy8W8LLgcEhRI9mp9azuPqP6sdyossUqBQxBOl32I3GNEcW5Fe_0304V8Yb7SDrSnqM"/>
+</div>
+<p class="text-[10px] text-center mt-1 text-primary font-bold">主持人</p>
+</div>
+<div class="flex-1 glass-panel rounded-2xl rounded-tl-none p-5 relative">
+<div class="absolute -left-2 top-0 w-4 h-4 glass-panel border-none rotate-45 -z-10"></div>
+<p class="text-slate-200 leading-relaxed text-lg">
+                        欢迎来到“拆书工坊”。今天我们开始读菲茨杰拉德的经典名著《了不起的盖茨比》。我们要跟随叙述者尼克的视角，进入那个充满香槟和幻象的爵士时代。
+                    </p>
+</div>
+</div>
+<!-- Dialogue Item: Expert -->
+<div class="flex gap-4 items-start flex-row-reverse group">
+<div class="flex-shrink-0">
+<div class="size-12 rounded-2xl overflow-hidden border-2 border-blue-400/30 group-hover:border-blue-400 transition-colors">
+<img class="w-full h-full object-cover" data-alt="Literary expert avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjkoeKqqflzQ_ElKM9vuN0vbFJp3YgWALeQkvNnAbg7IlVfUBwKsRQnGTfXswfzbSEScD3TgUfAIA9IFrwWNGDwbteXyguGVKHDpYymlK4d4cf7RPIOEelli-mXsTwMP_OqcHVKumtUoFlenLG-7BcKmQ03AnN51NNEbhuY9dtl_-LnJoJh7tjFujE-exinDw6NyjiS090KtCZFZp3GSe2iy0nUZEmT9KfOO7LA7tfz0I6RxnJ2v2sILJVNyjofuF6aRjcqjKuT3gJ"/>
+</div>
+<p class="text-[10px] text-center mt-1 text-blue-400 font-bold">文学专家</p>
+</div>
+<div class="flex-1 glass-panel rounded-2xl rounded-tr-none p-5 border-blue-400/10 bg-blue-400/5 relative">
+<div class="absolute -right-2 top-0 w-4 h-4 glass-panel border-none rotate-45 -z-10 bg-blue-900/20"></div>
+<p class="text-slate-200 leading-relaxed text-lg">
+                        没错。在第一章里，尼克向我们介绍了他的背景。他提到父亲曾告诫他：“每逢你想要批评任何人的时候，你就记住，这个世界上所有的人，并不是个个都有过你拥有的那些优越条件。” 这句话定下了整部小说的基调。
+                    </p>
+</div>
+</div>
+<!-- Dialogue Item: Host -->
+<div class="flex gap-4 items-start group">
+<div class="flex-shrink-0">
+<div class="size-12 rounded-2xl overflow-hidden border-2 border-primary/30">
+<img class="w-full h-full object-cover" data-alt="Host female avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-4FhA5TNjK8bisd8KE6hT5Z1_LVU-w2Ru_fqG7qIyEeS4lyFLgwlxsiJbYVUFEdxrRtV_Ydi81R1IyvJH_K3Frr0337SNdCZCMA87w0RwHGGkNMAaxRoM2cEnZS9G5PpPFg9SGfZyzohh-ub-m2TBt47x1QHAp0BT_hv5ziFTVr08o6t040x59gQFWLxaq43pG-RCczsjY-uofxrL3kLXCm4wjimTboToJeK1ADDkAKzfjsImjvrUfC22j_TVQ82P23Y7uu0JgxGs"/>
+</div>
+<p class="text-[10px] text-center mt-1 text-primary font-bold">主持人</p>
+</div>
+<div class="flex-1 glass-panel rounded-2xl rounded-tl-none p-5 relative">
+<p class="text-slate-200 leading-relaxed text-lg italic text-opacity-80">
+                        （若有所思）这种“道德上的立正姿势”在东部被打破了。当他回到中西部，他希望全世界都穿上军装。
+                    </p>
+</div>
+</div>
+</div>
+<!-- Chapter Navigation -->
+<div class="mt-16 flex justify-between items-center border-t border-white/10 pt-8">
+<button class="flex flex-col items-start group">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">上一章</span>
+<span class="text-slate-300 font-medium flex items-center gap-1 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span> 序言：菲茨杰拉德的世界
+                </span>
+</button>
+<button class="flex flex-col items-end group">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">下一章</span>
+<span class="text-slate-300 font-medium flex items-center gap-1 group-hover:text-white transition-colors">
+                    第二章：灰烬谷与神秘的眼睛 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</span>
+</button>
+</div>
+</main>
+<!-- Floating Audio Player -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-4xl z-50">
+<div class="glass-panel rounded-3xl p-4 shadow-2xl border-white/20 backdrop-blur-2xl">
+<div class="flex flex-col md:flex-row items-center gap-4">
+<!-- Info -->
+<div class="flex items-center gap-3 w-full md:w-1/4">
+<div class="size-12 rounded-xl bg-gradient-to-br from-primary to-accent-glow flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white text-3xl">equalizer</span>
+</div>
+<div class="overflow-hidden">
+<p class="text-white text-sm font-bold truncate">播客解读书籍：盖茨比</p>
+<p class="text-slate-400 text-xs truncate">双人对话模式 · 1.2x</p>
+</div>
+</div>
+<!-- Controls -->
+<div class="flex-1 w-full space-y-2">
+<div class="flex items-center justify-center gap-6">
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">skip_previous</span>
+</button>
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">replay_10</span>
+</button>
+<button class="size-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-105 transition-transform glow-orange">
+<span class="material-symbols-outlined fill-1 text-[32px]">pause</span>
+</button>
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">forward_30</span>
+</button>
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">skip_next</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-mono text-slate-400">08:45</span>
+<div class="flex-1 h-1.5 bg-white/10 rounded-full relative group cursor-pointer">
+<div class="absolute left-0 top-0 h-full w-[45%] bg-primary rounded-full"></div>
+<div class="absolute left-[45%] top-1/2 -translate-y-1/2 size-3 bg-white rounded-full shadow-lg scale-0 group-hover:scale-100 transition-transform"></div>
+</div>
+<span class="text-[10px] font-mono text-slate-400">18:22</span>
+</div>
+</div>
+<!-- Volume & Speed -->
+<div class="hidden md:flex items-center justify-end gap-4 w-1/4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">volume_up</span>
+<div class="w-16 h-1 bg-white/10 rounded-full">
+<div class="w-[70%] h-full bg-white/40 rounded-full"></div>
+</div>
+</div>
+<button class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-slate-300 hover:text-white transition-colors uppercase">
+                        1.2x Speed
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

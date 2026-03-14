@@ -4,7 +4,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
-def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None, subtitles=False):
+def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None, subtitles=False, subtitles_dir=None):
     # 将输入路径转为 Path 对象
     md_path = Path(md_file_path).resolve()
     
@@ -31,9 +31,12 @@ def convert_md_to_audio(md_file_path, voice="zh-CN-YunxiNeural", output_dir=None
     output_audio_path = audio_dir / f"{file_name}_Audio.mp3"
     
     if subtitles:
-        subtitles_dir = Path.cwd() / "subtitles" / parent_folder_name
-        subtitles_dir.mkdir(parents=True, exist_ok=True)
-        output_vtt_path = subtitles_dir / f"{file_name}_Subtitles.vtt"
+        if subtitles_dir:
+            sub_dir = Path(subtitles_dir).resolve()
+        else:
+            sub_dir = Path.cwd() / "subtitles" / parent_folder_name
+        sub_dir.mkdir(parents=True, exist_ok=True)
+        output_vtt_path = sub_dir / f"{file_name}_Subtitles.vtt"
     else:
         output_vtt_path = None
     
@@ -75,7 +78,8 @@ if __name__ == "__main__":
     parser.add_argument("md_file", help="要转换的 markdown 文件路径")
     parser.add_argument("--voice", default="zh-CN-YunxiNeural", help="使用的声音，默认：zh-CN-YunxiNeural (云希男声)")
     parser.add_argument("--out-dir", help="自定义输出目录", default=None)
+    parser.add_argument("--sub-dir", help="自定义字幕目录", default=None)
     parser.add_argument("--subtitles", action="store_true", help="是否生成字幕文件 (.vtt)")
     
     args = parser.parse_args()
-    convert_md_to_audio(args.md_file, voice=args.voice, output_dir=args.out_dir, subtitles=args.subtitles)
+    convert_md_to_audio(args.md_file, voice=args.voice, output_dir=args.out_dir, subtitles=args.subtitles, subtitles_dir=args.sub_dir)

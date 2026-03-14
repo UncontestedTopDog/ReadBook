@@ -26,12 +26,12 @@ def format_time(seconds):
 
 def generate_podcast(md_path, output_dir_base, subtitle_dir_base):
     md_file = Path(md_path)
-    output_dir = Path(output_dir_base) / md_file.parent.name
+    output_dir = Path(output_dir_base)
     output_dir.mkdir(parents=True, exist_ok=True)
     temp_dir = output_dir / "temp_segments"
     temp_dir.mkdir(parents=True, exist_ok=True)
     
-    subtitles_dir = Path(subtitle_dir_base) / md_file.parent.name
+    subtitles_dir = Path(subtitle_dir_base)
     subtitles_dir.mkdir(parents=True, exist_ok=True)
 
     with open(md_file, "r", encoding="utf-8") as f:
