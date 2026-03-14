@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from typing import Optional
 import tempfile
 import json
+import subprocess
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -48,6 +49,24 @@ def get_book_dir(book_name, subfolder=None):
 
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+def git_push_products(message):
+    """Utility to push generated files to GitHub."""
+    try:
+        # 1. Add everything (gitignore handles exclusions)
+        subprocess.run(["git", "add", "."], cwd=script_dir, check=True)
+        # 2. Commit if there are changes
+        # Check if there are staged changes first
+        status = subprocess.run(["git", "status", "--porcelain"], cwd=script_dir, capture_output=True, text=True)
+        if status.stdout.strip():
+            subprocess.run(["git", "commit", "-m", message], cwd=script_dir, check=True)
+            # 3. Push to remote
+            subprocess.run(["git", "push", "origin", "main"], cwd=script_dir, check=True)
+            print(f"🚀 Git synced: {message}")
+        else:
+            print("ℹ️ No changes to sync.")
+    except Exception as e:
+        print(f"⚠️ Git sync failed: {str(e)}")
 
 
 def read_book_details(book_name):
@@ -157,6 +176,7 @@ def upload_epub(file: UploadFile = File(...)):
         # 读取返回提取的内容
         details = read_book_details(book_name)
         if details:
+            git_push_products(f"Upload and extract: {book_name}")
             return JSONResponse({"success": True, **details})
         else:
             return JSONResponse({"success": False, "error": "Extraction failed or chapter directory missing"})
@@ -220,6 +240,7 @@ async def save_book_order(book_name: str, req: OrderRequest):
         with open(order_path, "w", encoding="utf-8") as f:
             json.dump(req.order, f, ensure_ascii=False, indent=2)
             
+        git_push_products(f"Update sort order: {book_name}")
         return JSONResponse({"success": True, "message": "排序已保存"})
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
@@ -246,6 +267,7 @@ def generate_chapter_audio(req: AudioRequest):
         
         # 调用技能进行音频转换和VTT提取
         convert_md_to_audio(md_file_path, output_dir=out_audio_dir, subtitles=True, subtitles_dir=out_sub_dir)
+        git_push_products(f"Generate audio: {req.book_name} - {req.chapter_title}")
         return JSONResponse({"success": True, "message": "音频及字幕生成成功"})
         
     except Exception as e:
@@ -307,7 +329,8 @@ def generate_book_mindmap(req: AudioRequest):
         
         with open(mindmap_path, "w", encoding="utf-8") as f:
             f.write(mindmap_content)
-            
+        
+        git_push_products(f"Generate mindmap: {req.book_name}")
         return JSONResponse({"success": True, "mindmap": mindmap_content})
         
     except Exception as e:
@@ -398,6 +421,7 @@ def generate_chapter_podcast(req: AudioRequest):
 
         # 调用技能进行多人播客生成
         generate_podcast(md_script_path, out_audio_dir, out_sub_dir)
+        git_push_products(f"Generate podcast: {req.book_name} - {req.chapter_title}")
         return JSONResponse({"success": True, "message": "Podcast及字幕生成成功"})
         
     except Exception as e:
