@@ -4,6 +4,11 @@
             "name": "心学日课21天",
             "cover": "https://raw.githubusercontent.com/UncontestedTopDog/ReadBook/refs/heads/main/%E5%BF%83%E5%AD%A6%E6%97%A5%E8%AF%BE21%E5%A4%A9/chapters/cover.jpg",
             "chapter_count": 21
+        },
+        {
+            "name": "商战",
+            "cover": "https://raw.githubusercontent.com/UncontestedTopDog/ReadBook/refs/heads/main/%E5%95%86%E6%88%98/chapters/cover.jpg",
+            "chapter_count": 36
         }
     ]
 }
