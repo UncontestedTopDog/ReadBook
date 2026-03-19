@@ -24,6 +24,11 @@
             "name": "[古罗马]奥古斯丁-上帝之城",
             "cover": "https://raw.githubusercontent.com/UncontestedTopDog/ReadBook/refs/heads/main/%5B%E5%8F%A4%E7%BD%97%E9%A9%AC%5D%E5%A5%A5%E5%8F%A4%E6%96%AF%E4%B8%81-%E4%B8%8A%E5%B8%9D%E4%B9%8B%E5%9F%8E/chapters/cover.jpeg",
             "chapter_count": 37
+        },
+        {
+            "name": "知行合一",
+            "cover": "https://raw.githubusercontent.com/UncontestedTopDog/ReadBook/refs/heads/main/%E7%9F%A5%E8%A1%8C%E5%90%88%E4%B8%80/chapters/cover.jpg",
+            "chapter_count": 22
         }
     ]
 }
